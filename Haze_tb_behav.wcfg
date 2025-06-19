@@ -1,0 +1,723 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="Haze_tb_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="Haze_tb" />
+            <top_module name="glbl" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="1657072679399fs"></ZoomStartTime>
+      <ZoomEndTime time="2131572679400fs"></ZoomEndTime>
+      <Cursor1Time time="1718272386000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="239"></NameColumnWidth>
+      <ValueColumnWidth column_width="72"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="3" />
+   <wvobject fp_name="group267" type="group">
+      <obj_property name="label">awb_turn</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/i_clk" type="logic">
+         <obj_property name="ElementShortName">i_clk</obj_property>
+         <obj_property name="ObjectShortName">i_clk</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/i_rst" type="logic">
+         <obj_property name="ElementShortName">i_rst</obj_property>
+         <obj_property name="ObjectShortName">i_rst</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/img_r" type="array">
+         <obj_property name="ElementShortName">img_r[7:0]</obj_property>
+         <obj_property name="ObjectShortName">img_r[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/img_g" type="array">
+         <obj_property name="ElementShortName">img_g[7:0]</obj_property>
+         <obj_property name="ObjectShortName">img_g[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/img_b" type="array">
+         <obj_property name="ElementShortName">img_b[7:0]</obj_property>
+         <obj_property name="ObjectShortName">img_b[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/img_hs" type="logic">
+         <obj_property name="ElementShortName">img_hs</obj_property>
+         <obj_property name="ObjectShortName">img_hs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/img_vs" type="logic">
+         <obj_property name="ElementShortName">img_vs</obj_property>
+         <obj_property name="ObjectShortName">img_vs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/o_img_hs" type="logic">
+         <obj_property name="ElementShortName">o_img_hs</obj_property>
+         <obj_property name="ObjectShortName">o_img_hs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/o_img_vs" type="logic">
+         <obj_property name="ElementShortName">o_img_vs</obj_property>
+         <obj_property name="ObjectShortName">o_img_vs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/o_img_r" type="array">
+         <obj_property name="ElementShortName">o_img_r[7:0]</obj_property>
+         <obj_property name="ObjectShortName">o_img_r[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/o_img_g" type="array">
+         <obj_property name="ElementShortName">o_img_g[7:0]</obj_property>
+         <obj_property name="ObjectShortName">o_img_g[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/o_img_b" type="array">
+         <obj_property name="ElementShortName">o_img_b[7:0]</obj_property>
+         <obj_property name="ObjectShortName">o_img_b[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/r_ram_rd_addr" type="array">
+         <obj_property name="ElementShortName">r_ram_rd_addr[8:0]</obj_property>
+         <obj_property name="ObjectShortName">r_ram_rd_addr[8:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/r_ram_rd_dout" type="array">
+         <obj_property name="ElementShortName">r_ram_rd_dout[31:0]</obj_property>
+         <obj_property name="ObjectShortName">r_ram_rd_dout[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/g_ram_rd_addr" type="array">
+         <obj_property name="ElementShortName">g_ram_rd_addr[8:0]</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_addr[8:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/g_ram_rd_dout" type="array">
+         <obj_property name="ElementShortName">g_ram_rd_dout[31:0]</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_dout[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/b_ram_rd_dout" type="array">
+         <obj_property name="ElementShortName">b_ram_rd_dout[31:0]</obj_property>
+         <obj_property name="ObjectShortName">b_ram_rd_dout[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/x_cnt" type="array">
+         <obj_property name="ElementShortName">x_cnt[15:0]</obj_property>
+         <obj_property name="ObjectShortName">x_cnt[15:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/y_cnt" type="array">
+         <obj_property name="ElementShortName">y_cnt[15:0]</obj_property>
+         <obj_property name="ObjectShortName">y_cnt[15:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/img_hs_d" type="array">
+         <obj_property name="ElementShortName">img_hs_d[15:0]</obj_property>
+         <obj_property name="ObjectShortName">img_hs_d[15:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/img_vs_d" type="array">
+         <obj_property name="ElementShortName">img_vs_d[15:0]</obj_property>
+         <obj_property name="ObjectShortName">img_vs_d[15:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/ram_hist_done" type="logic">
+         <obj_property name="ElementShortName">ram_hist_done</obj_property>
+         <obj_property name="ObjectShortName">ram_hist_done</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/ram_hist_done_d" type="array">
+         <obj_property name="ElementShortName">ram_hist_done_d[15:0]</obj_property>
+         <obj_property name="ObjectShortName">ram_hist_done_d[15:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/g_ram_rd" type="logic">
+         <obj_property name="ElementShortName">g_ram_rd</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/g_ram_rd_1d" type="logic">
+         <obj_property name="ElementShortName">g_ram_rd_1d</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/g_ram_rd_cnt" type="array">
+         <obj_property name="ElementShortName">g_ram_rd_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_cnt[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/g_ram_acc" type="array">
+         <obj_property name="ElementShortName">g_ram_acc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">g_ram_acc[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/r_ram_rd" type="logic">
+         <obj_property name="ElementShortName">r_ram_rd</obj_property>
+         <obj_property name="ObjectShortName">r_ram_rd</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/r_ram_rd_1d" type="logic">
+         <obj_property name="ElementShortName">r_ram_rd_1d</obj_property>
+         <obj_property name="ObjectShortName">r_ram_rd_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/r_ram_rd_cnt" type="array">
+         <obj_property name="ElementShortName">r_ram_rd_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">r_ram_rd_cnt[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/r_ram_acc" type="array">
+         <obj_property name="ElementShortName">r_ram_acc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">r_ram_acc[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/b_ram_acc" type="array">
+         <obj_property name="ElementShortName">b_ram_acc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">b_ram_acc[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/awb_turn" type="logic">
+         <obj_property name="ElementShortName">awb_turn</obj_property>
+         <obj_property name="ObjectShortName">awb_turn</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/mv_img_r_1d" type="array">
+         <obj_property name="ElementShortName">mv_img_r_1d[7:0]</obj_property>
+         <obj_property name="ObjectShortName">mv_img_r_1d[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/mv_img_g_1d" type="array">
+         <obj_property name="ElementShortName">mv_img_g_1d[7:0]</obj_property>
+         <obj_property name="ObjectShortName">mv_img_g_1d[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/mv_img_b_1d" type="array">
+         <obj_property name="ElementShortName">mv_img_b_1d[7:0]</obj_property>
+         <obj_property name="ObjectShortName">mv_img_b_1d[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/mv_img_r" type="array">
+         <obj_property name="ElementShortName">mv_img_r[7:0]</obj_property>
+         <obj_property name="ObjectShortName">mv_img_r[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/mv_img_g" type="array">
+         <obj_property name="ElementShortName">mv_img_g[7:0]</obj_property>
+         <obj_property name="ObjectShortName">mv_img_g[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/mv_img_b" type="array">
+         <obj_property name="ElementShortName">mv_img_b[7:0]</obj_property>
+         <obj_property name="ObjectShortName">mv_img_b[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/mth_img_hs" type="logic">
+         <obj_property name="ElementShortName">mth_img_hs</obj_property>
+         <obj_property name="ObjectShortName">mth_img_hs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/mth_img_vs" type="logic">
+         <obj_property name="ElementShortName">mth_img_vs</obj_property>
+         <obj_property name="ObjectShortName">mth_img_vs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/mth_img_r" type="array">
+         <obj_property name="ElementShortName">mth_img_r[7:0]</obj_property>
+         <obj_property name="ObjectShortName">mth_img_r[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/mth_img_g" type="array">
+         <obj_property name="ElementShortName">mth_img_g[7:0]</obj_property>
+         <obj_property name="ObjectShortName">mth_img_g[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/mth_img_b" type="array">
+         <obj_property name="ElementShortName">mth_img_b[7:0]</obj_property>
+         <obj_property name="ObjectShortName">mth_img_b[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/RB_TH" type="array">
+         <obj_property name="ElementShortName">RB_TH[31:0]</obj_property>
+         <obj_property name="ObjectShortName">RB_TH[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/G_TH" type="array">
+         <obj_property name="ElementShortName">G_TH[31:0]</obj_property>
+         <obj_property name="ObjectShortName">G_TH[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group294" type="group">
+      <obj_property name="label">hist_move</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/i_clk" type="logic">
+         <obj_property name="ElementShortName">i_clk</obj_property>
+         <obj_property name="ObjectShortName">i_clk</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/i_rst" type="logic">
+         <obj_property name="ElementShortName">i_rst</obj_property>
+         <obj_property name="ObjectShortName">i_rst</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/img_r" type="array">
+         <obj_property name="ElementShortName">img_r[7:0]</obj_property>
+         <obj_property name="ObjectShortName">img_r[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/img_g" type="array">
+         <obj_property name="ElementShortName">img_g[7:0]</obj_property>
+         <obj_property name="ObjectShortName">img_g[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/img_b" type="array">
+         <obj_property name="ElementShortName">img_b[7:0]</obj_property>
+         <obj_property name="ObjectShortName">img_b[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/img_hs" type="logic">
+         <obj_property name="ElementShortName">img_hs</obj_property>
+         <obj_property name="ObjectShortName">img_hs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/img_vs" type="logic">
+         <obj_property name="ElementShortName">img_vs</obj_property>
+         <obj_property name="ObjectShortName">img_vs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/o_img_hs" type="logic">
+         <obj_property name="ElementShortName">o_img_hs</obj_property>
+         <obj_property name="ObjectShortName">o_img_hs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/o_img_vs" type="logic">
+         <obj_property name="ElementShortName">o_img_vs</obj_property>
+         <obj_property name="ObjectShortName">o_img_vs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/o_img_r" type="array">
+         <obj_property name="ElementShortName">o_img_r[7:0]</obj_property>
+         <obj_property name="ObjectShortName">o_img_r[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/o_img_g" type="array">
+         <obj_property name="ElementShortName">o_img_g[7:0]</obj_property>
+         <obj_property name="ObjectShortName">o_img_g[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/o_img_b" type="array">
+         <obj_property name="ElementShortName">o_img_b[7:0]</obj_property>
+         <obj_property name="ObjectShortName">o_img_b[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/r_oa_max_pashe" type="array">
+         <obj_property name="ElementShortName">r_oa_max_pashe[31:0]</obj_property>
+         <obj_property name="ObjectShortName">r_oa_max_pashe[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/b_oa_max_pashe" type="array">
+         <obj_property name="ElementShortName">b_oa_max_pashe[31:0]</obj_property>
+         <obj_property name="ObjectShortName">b_oa_max_pashe[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/img_hs_d" type="array">
+         <obj_property name="ElementShortName">img_hs_d[15:0]</obj_property>
+         <obj_property name="ObjectShortName">img_hs_d[15:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/img_vs_d" type="array">
+         <obj_property name="ElementShortName">img_vs_d[15:0]</obj_property>
+         <obj_property name="ObjectShortName">img_vs_d[15:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/r_img_r_oa_max" type="array">
+         <obj_property name="ElementShortName">r_img_r_oa_max[31:0]</obj_property>
+         <obj_property name="ObjectShortName">r_img_r_oa_max[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/r_img_r_mv_phase" type="array">
+         <obj_property name="ElementShortName">r_img_r_mv_phase[31:0]</obj_property>
+         <obj_property name="ObjectShortName">r_img_r_mv_phase[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/r_img_l_oa_max" type="array">
+         <obj_property name="ElementShortName">r_img_l_oa_max[31:0]</obj_property>
+         <obj_property name="ObjectShortName">r_img_l_oa_max[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/r_img_l_mv_phase" type="array">
+         <obj_property name="ElementShortName">r_img_l_mv_phase[31:0]</obj_property>
+         <obj_property name="ObjectShortName">r_img_l_mv_phase[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/b_img_r_oa_max" type="array">
+         <obj_property name="ElementShortName">b_img_r_oa_max[31:0]</obj_property>
+         <obj_property name="ObjectShortName">b_img_r_oa_max[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/b_img_r_mv_phase" type="array">
+         <obj_property name="ElementShortName">b_img_r_mv_phase[31:0]</obj_property>
+         <obj_property name="ObjectShortName">b_img_r_mv_phase[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/b_img_l_oa_max" type="array">
+         <obj_property name="ElementShortName">b_img_l_oa_max[31:0]</obj_property>
+         <obj_property name="ObjectShortName">b_img_l_oa_max[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/b_img_l_mv_phase" type="array">
+         <obj_property name="ElementShortName">b_img_l_mv_phase[31:0]</obj_property>
+         <obj_property name="ObjectShortName">b_img_l_mv_phase[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/img_r_temp" type="array">
+         <obj_property name="ElementShortName">img_r_temp[7:0]</obj_property>
+         <obj_property name="ObjectShortName">img_r_temp[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_move_top/img_b_temp" type="array">
+         <obj_property name="ElementShortName">img_b_temp[7:0]</obj_property>
+         <obj_property name="ObjectShortName">img_b_temp[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="group374" type="group">
+      <obj_property name="label">hist_match</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/i_clk" type="logic">
+         <obj_property name="ElementShortName">i_clk</obj_property>
+         <obj_property name="ObjectShortName">i_clk</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/i_rst" type="logic">
+         <obj_property name="ElementShortName">i_rst</obj_property>
+         <obj_property name="ObjectShortName">i_rst</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/img_r" type="array">
+         <obj_property name="ElementShortName">img_r[7:0]</obj_property>
+         <obj_property name="ObjectShortName">img_r[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/img_g" type="array">
+         <obj_property name="ElementShortName">img_g[7:0]</obj_property>
+         <obj_property name="ObjectShortName">img_g[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/img_b" type="array">
+         <obj_property name="ElementShortName">img_b[7:0]</obj_property>
+         <obj_property name="ObjectShortName">img_b[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/img_hs" type="logic">
+         <obj_property name="ElementShortName">img_hs</obj_property>
+         <obj_property name="ObjectShortName">img_hs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/img_vs" type="logic">
+         <obj_property name="ElementShortName">img_vs</obj_property>
+         <obj_property name="ObjectShortName">img_vs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/o_img_hs" type="logic">
+         <obj_property name="ElementShortName">o_img_hs</obj_property>
+         <obj_property name="ObjectShortName">o_img_hs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/o_img_vs" type="logic">
+         <obj_property name="ElementShortName">o_img_vs</obj_property>
+         <obj_property name="ObjectShortName">o_img_vs</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/o_img_r" type="array">
+         <obj_property name="ElementShortName">o_img_r[7:0]</obj_property>
+         <obj_property name="ObjectShortName">o_img_r[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/o_img_g" type="array">
+         <obj_property name="ElementShortName">o_img_g[7:0]</obj_property>
+         <obj_property name="ObjectShortName">o_img_g[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/o_img_b" type="array">
+         <obj_property name="ElementShortName">o_img_b[7:0]</obj_property>
+         <obj_property name="ObjectShortName">o_img_b[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_ram_rd_en" type="logic">
+         <obj_property name="ElementShortName">r_ram_rd_en</obj_property>
+         <obj_property name="ObjectShortName">r_ram_rd_en</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_ram_rd_addr" type="array">
+         <obj_property name="ElementShortName">r_ram_rd_addr[8:0]</obj_property>
+         <obj_property name="ObjectShortName">r_ram_rd_addr[8:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_ram_rd_valid" type="logic">
+         <obj_property name="ElementShortName">r_ram_rd_valid</obj_property>
+         <obj_property name="ObjectShortName">r_ram_rd_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_ram_rd_dout" type="array">
+         <obj_property name="ElementShortName">r_ram_rd_dout[31:0]</obj_property>
+         <obj_property name="ObjectShortName">r_ram_rd_dout[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_ram_rd_en" type="logic">
+         <obj_property name="ElementShortName">g_ram_rd_en</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_en</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_ram_rd_addr" type="array">
+         <obj_property name="ElementShortName">g_ram_rd_addr[8:0]</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_addr[8:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_ram_rd_valid" type="logic">
+         <obj_property name="ElementShortName">g_ram_rd_valid</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_ram_rd_dout" type="array">
+         <obj_property name="ElementShortName">g_ram_rd_dout[31:0]</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_dout[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_ram_rd_en" type="logic">
+         <obj_property name="ElementShortName">b_ram_rd_en</obj_property>
+         <obj_property name="ObjectShortName">b_ram_rd_en</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_ram_rd_addr" type="array">
+         <obj_property name="ElementShortName">b_ram_rd_addr[8:0]</obj_property>
+         <obj_property name="ObjectShortName">b_ram_rd_addr[8:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_ram_rd_valid" type="logic">
+         <obj_property name="ElementShortName">b_ram_rd_valid</obj_property>
+         <obj_property name="ObjectShortName">b_ram_rd_valid</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_ram_rd_dout" type="array">
+         <obj_property name="ElementShortName">b_ram_rd_dout[31:0]</obj_property>
+         <obj_property name="ObjectShortName">b_ram_rd_dout[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/x_cnt" type="array">
+         <obj_property name="ElementShortName">x_cnt[15:0]</obj_property>
+         <obj_property name="ObjectShortName">x_cnt[15:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/y_cnt" type="array">
+         <obj_property name="ElementShortName">y_cnt[15:0]</obj_property>
+         <obj_property name="ObjectShortName">y_cnt[15:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/img_hs_d" type="array">
+         <obj_property name="ElementShortName">img_hs_d[15:0]</obj_property>
+         <obj_property name="ObjectShortName">img_hs_d[15:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/img_vs_d" type="array">
+         <obj_property name="ElementShortName">img_vs_d[15:0]</obj_property>
+         <obj_property name="ObjectShortName">img_vs_d[15:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/ram_hist_done" type="logic">
+         <obj_property name="ElementShortName">ram_hist_done</obj_property>
+         <obj_property name="ObjectShortName">ram_hist_done</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/ram_hist_done_d" type="array">
+         <obj_property name="ElementShortName">ram_hist_done_d[15:0]</obj_property>
+         <obj_property name="ObjectShortName">ram_hist_done_d[15:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_hist_acc_1d" type="array">
+         <obj_property name="ElementShortName">g_hist_acc_1d[31:0]</obj_property>
+         <obj_property name="ObjectShortName">g_hist_acc_1d[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_hist_acc" type="array">
+         <obj_property name="ElementShortName">r_hist_acc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">r_hist_acc[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_ram_rd_en_1d" type="logic">
+         <obj_property name="ElementShortName">r_ram_rd_en_1d</obj_property>
+         <obj_property name="ObjectShortName">r_ram_rd_en_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_ram_rd_en_2d" type="logic">
+         <obj_property name="ElementShortName">r_ram_rd_en_2d</obj_property>
+         <obj_property name="ObjectShortName">r_ram_rd_en_2d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_acc_match_succ" type="logic">
+         <obj_property name="ElementShortName">r_acc_match_succ</obj_property>
+         <obj_property name="ObjectShortName">r_acc_match_succ</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_acc_match_succ_1d" type="logic">
+         <obj_property name="ElementShortName">r_acc_match_succ_1d</obj_property>
+         <obj_property name="ObjectShortName">r_acc_match_succ_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_ram_rd_valid_1d" type="logic">
+         <obj_property name="ElementShortName">r_ram_rd_valid_1d</obj_property>
+         <obj_property name="ObjectShortName">r_ram_rd_valid_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_ram_rd_valid_2d" type="logic">
+         <obj_property name="ElementShortName">r_ram_rd_valid_2d</obj_property>
+         <obj_property name="ObjectShortName">r_ram_rd_valid_2d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_ram_rd_valid_3d" type="logic">
+         <obj_property name="ElementShortName">r_ram_rd_valid_3d</obj_property>
+         <obj_property name="ObjectShortName">r_ram_rd_valid_3d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_hist_acc" type="array">
+         <obj_property name="ElementShortName">b_hist_acc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">b_hist_acc[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_ram_rd_en_1d" type="logic">
+         <obj_property name="ElementShortName">b_ram_rd_en_1d</obj_property>
+         <obj_property name="ObjectShortName">b_ram_rd_en_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_ram_rd_en_2d" type="logic">
+         <obj_property name="ElementShortName">b_ram_rd_en_2d</obj_property>
+         <obj_property name="ObjectShortName">b_ram_rd_en_2d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_acc_match_succ" type="logic">
+         <obj_property name="ElementShortName">b_acc_match_succ</obj_property>
+         <obj_property name="ObjectShortName">b_acc_match_succ</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_acc_match_succ_1d" type="logic">
+         <obj_property name="ElementShortName">b_acc_match_succ_1d</obj_property>
+         <obj_property name="ObjectShortName">b_acc_match_succ_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_ram_rd_valid_1d" type="logic">
+         <obj_property name="ElementShortName">b_ram_rd_valid_1d</obj_property>
+         <obj_property name="ObjectShortName">b_ram_rd_valid_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_ram_rd_valid_2d" type="logic">
+         <obj_property name="ElementShortName">b_ram_rd_valid_2d</obj_property>
+         <obj_property name="ObjectShortName">b_ram_rd_valid_2d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_ram_rd_valid_3d" type="logic">
+         <obj_property name="ElementShortName">b_ram_rd_valid_3d</obj_property>
+         <obj_property name="ObjectShortName">b_ram_rd_valid_3d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_ram_rd_dout_1d" type="array">
+         <obj_property name="ElementShortName">g_ram_rd_dout_1d[31:0]</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_dout_1d[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_ram_rd_dout_2d" type="array">
+         <obj_property name="ElementShortName">g_ram_rd_dout_2d[31:0]</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_dout_2d[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_ram_rd_dout_3d" type="array">
+         <obj_property name="ElementShortName">g_ram_rd_dout_3d[31:0]</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_dout_3d[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_ram_rd_dout_4d" type="array">
+         <obj_property name="ElementShortName">g_ram_rd_dout_4d[31:0]</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_dout_4d[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_hist_acc" type="array">
+         <obj_property name="ElementShortName">g_hist_acc[31:0]</obj_property>
+         <obj_property name="ObjectShortName">g_hist_acc[31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_ram_rd_en_1d" type="logic">
+         <obj_property name="ElementShortName">g_ram_rd_en_1d</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_en_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_ram_rd_en_2d" type="logic">
+         <obj_property name="ElementShortName">g_ram_rd_en_2d</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_en_2d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_ram_rd_valid_1d" type="logic">
+         <obj_property name="ElementShortName">g_ram_rd_valid_1d</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_valid_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/dr_ram_rd_valid_g_1d" type="logic">
+         <obj_property name="ElementShortName">dr_ram_rd_valid_g_1d</obj_property>
+         <obj_property name="ObjectShortName">dr_ram_rd_valid_g_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/dr_ram_rd_valid_b_1d" type="logic">
+         <obj_property name="ElementShortName">dr_ram_rd_valid_b_1d</obj_property>
+         <obj_property name="ObjectShortName">dr_ram_rd_valid_b_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/dr_ram_rd_valid_r_1d" type="logic">
+         <obj_property name="ElementShortName">dr_ram_rd_valid_r_1d</obj_property>
+         <obj_property name="ObjectShortName">dr_ram_rd_valid_r_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_acc_match_succ_d" type="array">
+         <obj_property name="ElementShortName">r_acc_match_succ_d[7:0]</obj_property>
+         <obj_property name="ObjectShortName">r_acc_match_succ_d[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_acc_match_succ_d" type="array">
+         <obj_property name="ElementShortName">b_acc_match_succ_d[7:0]</obj_property>
+         <obj_property name="ObjectShortName">b_acc_match_succ_d[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_hist_ram_rd" type="logic">
+         <obj_property name="ElementShortName">g_hist_ram_rd</obj_property>
+         <obj_property name="ObjectShortName">g_hist_ram_rd</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_ram_rd_cnt" type="array">
+         <obj_property name="ElementShortName">g_ram_rd_cnt[7:0]</obj_property>
+         <obj_property name="ObjectShortName">g_ram_rd_cnt[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_match_value" type="array">
+         <obj_property name="ElementShortName">r_match_value[7:0]</obj_property>
+         <obj_property name="ObjectShortName">r_match_value[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_match_value" type="array">
+         <obj_property name="ElementShortName">b_match_value[7:0]</obj_property>
+         <obj_property name="ObjectShortName">b_match_value[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_rd_en_1d" type="logic">
+         <obj_property name="ElementShortName">g_rd_en_1d</obj_property>
+         <obj_property name="ObjectShortName">g_rd_en_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_rd_busy_1d" type="logic">
+         <obj_property name="ElementShortName">r_rd_busy_1d</obj_property>
+         <obj_property name="ObjectShortName">r_rd_busy_1d</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_rd_busy_d" type="array">
+         <obj_property name="ElementShortName">r_rd_busy_d[7:0]</obj_property>
+         <obj_property name="ObjectShortName">r_rd_busy_d[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_rd_busy_d" type="array">
+         <obj_property name="ElementShortName">b_rd_busy_d[7:0]</obj_property>
+         <obj_property name="ObjectShortName">b_rd_busy_d[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/busy" type="logic">
+         <obj_property name="ElementShortName">busy</obj_property>
+         <obj_property name="ObjectShortName">busy</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_dout" type="array">
+         <obj_property name="ElementShortName">r_dout[7:0]</obj_property>
+         <obj_property name="ObjectShortName">r_dout[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_dout" type="array">
+         <obj_property name="ElementShortName">b_dout[7:0]</obj_property>
+         <obj_property name="ObjectShortName">b_dout[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/img_g_1d" type="array">
+         <obj_property name="ElementShortName">img_g_1d[7:0]</obj_property>
+         <obj_property name="ObjectShortName">img_g_1d[7:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/dr_ram_rd_valid_r" type="logic">
+         <obj_property name="ElementShortName">dr_ram_rd_valid_r</obj_property>
+         <obj_property name="ObjectShortName">dr_ram_rd_valid_r</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/dr_ram_rd_valid_g" type="logic">
+         <obj_property name="ElementShortName">dr_ram_rd_valid_g</obj_property>
+         <obj_property name="ObjectShortName">dr_ram_rd_valid_g</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/dr_ram_rd_valid_b" type="logic">
+         <obj_property name="ElementShortName">dr_ram_rd_valid_b</obj_property>
+         <obj_property name="ObjectShortName">dr_ram_rd_valid_b</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/r_rd_busy" type="logic">
+         <obj_property name="ElementShortName">r_rd_busy</obj_property>
+         <obj_property name="ObjectShortName">r_rd_busy</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/b_rd_busy" type="logic">
+         <obj_property name="ElementShortName">b_rd_busy</obj_property>
+         <obj_property name="ObjectShortName">b_rd_busy</obj_property>
+      </wvobject>
+      <wvobject fp_name="/Haze_tb/Hist_awb_turn/Hist_match/g_rd_en" type="logic">
+         <obj_property name="ElementShortName">g_rd_en</obj_property>
+         <obj_property name="ObjectShortName">g_rd_en</obj_property>
+      </wvobject>
+   </wvobject>
+</wave_config>

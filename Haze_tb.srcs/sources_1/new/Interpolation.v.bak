@@ -1,0 +1,180 @@
+module clahe_interpolation (
+    input      i_clk      ,
+    input      i_rst      ,
+    input      img_vs     ,
+    input      img_hs     ,
+    input  [7:0] img_y    ,
+	
+	output       o_img_vs  ,
+	output       o_img_hs  ,
+	output [7:0] o_img_y   
+
+
+  
+);
+    
+reg [15:0] x_cnt, y_cnt;     // 像素坐标计数�?(0-1919,0-1079)
+
+reg [15:0] x_cnt_1d;
+reg [15:0] y_cnt_1d; 
+reg [15:0] x_cnt_2d; 
+reg [15:0] y_cnt_2d; 
+reg img_hs_1d;
+reg img_vs_1d;
+reg img_vs_2d;
+reg img_vs_3d;
+reg img_vs_4d;
+reg img_vs_5d;
+
+reg [7:0] img_y_1d;
+reg [7:0] img_y_2d;
+reg [7:0] img_y_3d;
+reg [7:0] img_y_4d;
+reg [7:0] img_y_5d;
+reg [7:0] img_y_6d;
+
+
+
+
+reg [299:0] img_hs_d;
+reg [299:0] img_vs_d;
+
+
+
+always@(posedge i_clk or posedge i_rst) 
+begin 
+	if(i_rst)begin  
+		img_vs_1d <= 'd0;
+		img_vs_2d <= 'd0;
+	    img_vs_3d <= 'd0;
+		img_vs_4d <= 'd0;
+        img_vs_5d <= 'd0;
+		img_hs_d  <= 'd0;
+        img_vs_d  <= 'd0;
+		img_y_1d <= 'd0;
+	    img_y_2d <= 'd0;
+        img_y_3d <= 'd0;
+        img_y_4d <= 'd0;
+        img_y_5d <= 'd0;
+        img_y_6d <= 'd0;
+
+		x_cnt_1d <= 'd0;
+        y_cnt_1d <= 'd0;
+        
+        x_cnt_2d <= 'd0;
+        y_cnt_2d <= 'd0;
+	end else begin
+		img_vs_1d <= img_vs;
+		img_vs_2d <= img_vs_1d;
+        img_vs_3d <= img_vs_2d;
+		img_vs_4d <= img_vs_3d;
+        img_vs_5d <= img_vs_4d;
+
+		img_hs_d <= { img_hs_d[298:0] , img_hs};
+		img_vs_d <= { img_vs_d[298:0] , img_vs};
+
+		img_y_1d <= img_y    ;
+        img_y_2d <= img_y_1d ;
+        img_y_3d <= img_y_2d ;
+        img_y_4d <= img_y_3d ;
+        img_y_5d <= img_y_4d ;
+        img_y_6d <= img_y_5d ;
+
+		x_cnt_1d <= x_cnt;
+        y_cnt_1d <= y_cnt;
+        
+        x_cnt_2d <= x_cnt_1d;
+        y_cnt_2d <= y_cnt_1d;
+	end            
+end 
+
+always@(posedge i_clk or posedge i_rst) 
+begin 
+	if(i_rst)  
+		img_hs_1d <= 'd0;	
+	else 
+		img_hs_1d <= img_hs;
+end 
+
+always@(posedge i_clk or posedge i_rst) 
+begin 
+	if(i_rst)  
+		x_cnt <= 'd0;	
+	else if(img_hs)
+		x_cnt <= x_cnt + 1;
+	else 
+		x_cnt <= 'd0;
+end 
+
+always@(posedge i_clk or posedge i_rst) 
+begin 
+	if(i_rst)  
+		y_cnt <= 'd0;
+	else if(!img_vs)
+		y_cnt <= 'd0;
+	else if(img_hs_1d && !img_hs)
+		y_cnt <= y_cnt + 1;
+	else 
+		y_cnt <= y_cnt;
+end
+
+// 坐标计算 
+wire [10:0] x_in_block;  assign x_in_block = x_cnt % 480;  // 块内X坐标 
+wire [10:0] y_in_block;  assign y_in_block = y_cnt % 270; // 块内Y坐标 
+
+ 
+
+reg [15:0] dx, dy; // 相对位置权重 
+reg [7 :0] line_ram0[0:1919];
+
+    
+always @(posedge i_clk) 
+begin
+	if(img_hs_d[1])
+		line_ram0[x_cnt_2d] <= img_y_2d; 
+end 
+
+always @(posedge i_clk or posedge i_rst) 
+begin
+	if(i_rst)begin
+		dx <= 'd0;
+        dy <= 'd0;
+	end else begin
+		// 计算相对位置权重   4096 Q12	
+		dx <= x_in_block * 8; 
+		dy <= y_in_block * 15;
+	end 
+end 
+
+// 双线性插值流水线 
+reg  [39:0] w00, W01,w10,w11;
+reg  [39:0] h0,h1,h2, v_result;
+reg [23:0] pixel_out; 
+always @(posedge i_clk) begin 
+	/*if(x_cnt == 479  && y_cnt == 269 || x_cnt == 479  && y_cnt == 539 || x_cnt == 479  && y_cnt == 809 || x_cnt == 479  && y_cnt == 1079 ||
+	   x_cnt == 959  && y_cnt == 269 || x_cnt == 959  && y_cnt == 539 || x_cnt == 959  && y_cnt == 809 || x_cnt == 959  && y_cnt == 1079 ||
+	   x_cnt == 1439 && y_cnt == 269 || x_cnt == 1439 && y_cnt == 539 || x_cnt == 1439 && y_cnt == 809 || x_cnt == 1439 && y_cnt == 1079 ||
+	   x_cnt == 1919 && y_cnt == 269 || x_cnt == 1919 && y_cnt == 539 || x_cnt == 1919 && y_cnt == 809 || x_cnt == 1919 && y_cnt == 1079 
+	  )
+		pixel_out <= img_y * 4095;
+	else if(x_cnt == 479 || x_cnt == 959 || x_cnt == 1439)
+		pixel_out <= (img_y_1d * (4096 - dx) + img_y * dx) ;
+	else if(y_cnt == 269 || y_cnt == 539 || y_cnt == 809)
+		pixel_out <= img_y * (4096 - dy) + line_ram0[x_cnt] * dy ;
+	else */begin
+		w00 <= (4096 - dx) * (4096 - dy);//<<24
+        W01 <= (4096 - dy) * dx;
+		w10 <= (4096 - dx) * dy;
+		w11 <= dy * dx;
+		h0 <= img_y_1d * w00 + img_y * W01;
+        h1 <= h0 + line_ram0[x_cnt_1d] * w10;  
+		v_result <= h1 + line_ram0[x_cnt] * w11;
+        pixel_out <= v_result >> 12; 
+	end
+end 
+
+
+assign o_img_vs = img_vs;
+assign o_img_hs = img_hs;
+assign o_img_y  = (pixel_out >> 12) >= 255 ? 255 :  (pixel_out >> 12); 
+endmodule 

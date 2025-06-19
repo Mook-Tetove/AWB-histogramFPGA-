@@ -1,0 +1,267 @@
+`timescale 1ns/1ns
+module Haze_Removal_top #(
+	parameter	[10:0]	IMG_HDISP = 11'd1280, 
+	parameter	[10:0]	IMG_VDISP = 11'd720  
+)      
+(
+	input				clk             ,  				 
+	input				rst_n           ,				 
+
+	input				per_frame_vsync ,	 //去雾前的图像
+	input				per_frame_href  ,		 
+	input				per_frame_clken ,	 
+	input		[7:0]	per_img_red     ,		 
+	input		[7:0]	per_img_green   ,		 
+	input		[7:0]	per_img_blue    ,		 
+
+	output				post_frame_vsync,	 //去雾后的图像
+	output				post_frame_href ,	 
+	output				post_frame_clken,	 		 
+	output		[7:0]	post_img_red    ,	
+	output		[7:0]	post_img_green  ,	
+	output		[7:0]	post_img_blue	,
+    
+    input               haze_removal_en     //去雾算法使能
+); 
+
+
+//----------------------------------------------------------------------------
+//VIP 算法—�?�计算彩色图像的暗�?�道，共消�??5个时钟周�?
+
+wire 		post0_frame_vsync   ;   
+wire 		post0_frame_href    ;   
+wire 		post0_frame_clken   ;    
+wire [7:0]	post0_img_dark      ;   //暗�?�道图像
+
+wire [7:0]	post0_img_red       ;   //与暗通道图像同步的原始彩色图�?
+wire [7:0]	post0_img_green     ;	 
+wire [7:0]	post0_img_blue      ;
+
+VIP_Dark_Channel	u_VIP_Dark_Channel (
+	.clk				(clk                ),					
+	.rst_n				(rst_n              ),				
+
+	.per_frame_vsync	(per_frame_vsync    ),		
+	.per_frame_href		(per_frame_href     ),		
+	.per_frame_clken	(per_frame_clken    ),		
+	.per_img_red		(per_img_red        ),			
+	.per_img_green		(per_img_green      ),		
+	.per_img_blue		(per_img_blue       ),			
+	
+	.post_frame_vsync	(post0_frame_vsync  ),	
+	.post_frame_href	(post0_frame_href   ),		
+	.post_frame_clken	(post0_frame_clken  ),			
+	.post_img_dark		(post0_img_dark     ),		//暗�?�道图像
+    
+	.post_img_red  	    (post0_img_red      ),		 
+	.post_img_green	    (post0_img_green    ),		 
+	.post_img_blue 	    (post0_img_blue     )
+);
+
+//----------------------------------------------------------------------------
+//计算大气光强�?
+
+wire [ 7:0] atmospheric_light;  //大气光强�?
+
+VIP_Atmospheric_Light #(
+	.IMG_HDISP          (IMG_HDISP          ), 
+	.IMG_VDISP          (IMG_VDISP          ) 
+)
+u_VIP_Atmospheric_Light(
+	.clk				(clk                ),					
+	.rst_n				(rst_n              ),	
+
+	.per_frame_vsync	(post0_frame_vsync  ),		
+	.per_frame_href		(post0_frame_href   ),		
+	.per_frame_clken	(post0_frame_clken  ),	
+    .per_img_dark       (post0_img_dark     ),  //暗�?�道图像
+    
+	.per_img_red		(post0_img_red      ),	//彩色图像		
+	.per_img_green		(post0_img_green    ),		
+	.per_img_blue		(post0_img_blue     ),	
+
+    .atmospheric_light  (atmospheric_light  ),  //大气光强�?
+    .atmospheric_pos_x  (                   ),
+    .atmospheric_pos_y  (                   ) 
+);
+
+//----------------------------------------------------------------------------
+//计算透射率图，消�?26个时钟周�?
+
+wire 		post1_frame_vsync ;   
+wire 		post1_frame_href  ;   
+wire 		post1_frame_clken ;    
+wire [7:0]	post1_transmission; //透射�?
+
+VIP_Transmission_Map u_VIP_Transmission_Map(
+	.clk				(clk                ),					
+	.rst_n				(rst_n              ),
+    
+	.per_frame_vsync	(post0_frame_vsync  ),		
+	.per_frame_href		(post0_frame_href   ),		
+	.per_frame_clken	(post0_frame_clken  ),	
+    .per_img_dark       (post0_img_dark     ),  //暗�?�道图像
+
+    .atmospheric_light  (atmospheric_light  ),  //大气光强�?
+
+	.post_frame_vsync	(per_guide_vs  ),	
+	.post_frame_href	(  ),		
+	.post_frame_clken	(per_guide_hs  ),			
+	.post_transmission	(per_guide_data )   //透射�?	
+);
+wire        per_guide_hs;
+wire        per_guide_vs;
+wire [7:0]  per_guide_data;
+wire        post_guide_hs;
+wire        post_guide_vs;
+wire [7:0]  post_guide_data;
+
+guide_filter#(
+    .IMG_HDISP(IMG_HDISP),
+    .IMG_VDISP(IMG_VDISP)
+)guide_filter(
+        .i_clk          (clk),
+        .i_rst          (!rst_n),
+        .per_img_href   (per_guide_hs),
+        .per_img_vsync  (!per_guide_vs),
+        .per_img_B      (per_guide_data),
+        
+        .post_img_B     (post_guide_data),
+        .post_img_href  (post_guide_hs),
+        .post_img_vsync (post_guide_vs)
+
+);
+assign post1_frame_vsync    =!post_guide_vs;
+assign post1_frame_href     =post_guide_hs;
+assign post1_frame_clken    =post_guide_hs;
+assign post1_transmission   =post_guide_data;
+
+//--------------------------------------
+//将彩色图像延�?26个时钟，与�?�射率图像同�?
+
+wire [23:0] dly26_img_rgb;
+
+dmk_shift_regs #(
+    .DWIDTH         (24     ) ,  //位宽
+    .DELAY_DUTY     (26+52     )    //延迟时钟周期
+    )
+u_delay_26clk(
+    .clk            (clk    ),
+    .rst_n          (rst_n  ),
+
+    .idata          ({post0_img_red,post0_img_green,post0_img_blue}),
+    .odata          (dly26_img_rgb  )
+);
+
+//----------------------------------------------------------------------------
+//根据透射率图像，从有雾图像中恢复场景辐射，消�?27个时钟周�?
+
+wire 		post2_frame_vsync;   
+wire 		post2_frame_href ;   
+wire 		post2_frame_clken;    
+wire [7:0]	post2_img_red	 ;  
+wire [7:0]	post2_img_green  ;  
+wire [7:0]	post2_img_blue	 ;  
+
+VIP_scene_radiance	u_VIP_scene_radiance
+(
+	.clk				(clk                    ),					
+	.rst_n				(rst_n                  ),				
+    
+	.per_frame_vsync	(post1_frame_vsync      ),		
+	.per_frame_href		(post1_frame_href       ),		
+	.per_frame_clken	(post1_frame_clken      ),
+        
+	.per_transmission	(post1_transmission     ),      //透射�?
+    
+	.per_img_red		(dly26_img_rgb[23:16]   ),		//有雾图像	
+	.per_img_green		(dly26_img_rgb[15: 8]   ),		
+	.per_img_blue		(dly26_img_rgb[ 7: 0]   ),			
+
+    .atmospheric_light  (atmospheric_light      ),      //大气光强�?
+        
+	.post_frame_vsync	(post2_frame_vsync      ),	
+	.post_frame_href	(post2_frame_href       ),		
+	.post_frame_clken	(post2_frame_clken      ),			
+	.post_img_red		(post2_img_red	        ),		//无雾图像	
+	.post_img_green		(post2_img_green        ),			
+	.post_img_blue		(post2_img_blue	        )			
+);
+
+//----------------------------------------------------------------------------
+//VIP 算法—�?�Gamma校正，提升去雾图像亮度，消�??1个时钟周�?
+
+wire 			post3_frame_vsync   ;   
+wire 			post3_frame_href    ;   
+wire 			post3_frame_clken   ;    
+wire [7:0]		post3_img_red	    ;   
+wire [7:0]		post3_img_green     ;   
+wire [7:0]		post3_img_blue	    ;   
+
+Curve_Gamma_1div_1P3 R_Gamma_1div_1P3(
+	.clk				(clk                ),  			  
+	.rst_n				(rst_n              ),	
+
+	.per_frame_vsync	(post2_frame_vsync  ),	  
+	.per_frame_href		(post2_frame_href   ),	  
+	.per_frame_clken	(post2_frame_clken  ),	  
+	.per_img_gray		(post2_img_red	    ),		  	  
+
+	.post_frame_vsync	(post3_frame_vsync  ),
+	.post_frame_href	(post3_frame_href   ),	
+	.post_frame_clken	(post3_frame_clken  ),
+	.post_img_gray		(post3_img_red      )	
+);
+
+Curve_Gamma_1div_1P3 G_Gamma_1div_1P3(
+	.clk				(clk                ),  			  
+	.rst_n				(rst_n              ),	
+
+	.per_frame_vsync	(post2_frame_vsync  ),	  
+	.per_frame_href		(post2_frame_href   ),	  
+	.per_frame_clken	(post2_frame_clken  ),	  
+	.per_img_gray		(post2_img_green    ),		  	  
+
+	.post_img_gray		(post3_img_green    )	
+);
+
+Curve_Gamma_1div_1P3 B_Gamma_1div_1P3(
+	.clk				(clk                ),  			  
+	.rst_n				(rst_n              ),	
+
+	.per_frame_vsync	(post2_frame_vsync  ),	  
+	.per_frame_href		(post2_frame_href   ),	  
+	.per_frame_clken	(post2_frame_clken  ),	  
+	.per_img_gray		(post2_img_blue	    ),		  	  
+
+	.post_img_gray		(post3_img_blue     )	
+);
+
+//--------------------------------------
+//将彩色图像延�?28个时钟，与Gamma校正后的图像同步
+
+wire [23:0] dly28_img_rgb;
+
+dmk_shift_regs #(
+    .DWIDTH         (24             ) ,  //位宽
+    .DELAY_DUTY     (26             )    //延迟时钟周期
+    )       
+u_delay_28clk(      
+    .clk            (clk            ),
+    .rst_n          (rst_n          ),
+
+    .idata          (dly26_img_rgb  ),
+    .odata          (dly28_img_rgb  )
+);
+
+
+
+assign post_img_red     = haze_removal_en ? post3_img_red   : dly28_img_rgb[23:16];
+assign post_img_green   = haze_removal_en ? post3_img_green : dly28_img_rgb[15: 8];
+assign post_img_blue    = haze_removal_en ? post3_img_blue  : dly28_img_rgb[ 7: 0];
+
+assign post_frame_vsync = post3_frame_vsync   ;	 
+assign post_frame_href  = post3_frame_href    ;	 
+assign post_frame_clken = post3_frame_clken   ;	 		 
+
+endmodule

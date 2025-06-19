@@ -1,0 +1,1604 @@
+module CLAHE #(                                            
+    parameter      H 			= 1920 	,
+	parameter      V 			= 1080 	,
+	parameter      DATA_WIDTH 	= 8     
+)(
+    input 			i_clk				,      
+    input 			i_rst				,      
+    input  [7:0] 	img_y				, 
+    input 			img_hs				, 
+    input 			img_vs				,    
+    output      	o_img_vs 			,
+    output      	o_img_hs 			,  
+    output [7:0] 	o_img_y
+);
+
+localparam Clip_limit = 800 ;
+localparam H_BLOCKS = 4;
+localparam V_BLOCKS = 4;
+localparam BLOCK_W = 1920 / H_BLOCKS;  // 480 
+localparam BLOCK_H = 1080 / V_BLOCKS;  // 270 
+
+reg [8:0] i;
+wire rst;
+assign rst = i == 256 ? 'd0 : 'd1;
+
+reg [15:0] x_cnt, y_cnt;     // 像素坐标计数�?(0-1919,0-1079)
+reg img_hs_1d;
+reg img_hs_2d;
+reg img_vs_1d;
+reg img_vs_2d;
+reg img_vs_3d;
+reg img_vs_4d;
+reg img_vs_5d;
+
+reg [299:0] img_hs_d;
+reg [299:0] img_vs_d;
+
+wire [3:0] block_x = x_cnt[10:7]; // 水平块索�?(0-15)
+wire [4:0] block_y = y_cnt[9:5];  // 垂直块索�?(0-19)
+
+wire window0 ;
+wire window1 ;
+wire window2 ;
+wire window3 ;
+wire window4 ;
+wire window5 ;
+wire window6 ;
+wire window7 ;
+wire window8 ;
+wire window9 ;
+wire window10;
+wire window11;
+wire window12;
+wire window13;
+wire window14;
+wire window15;
+assign window0  = x_cnt >= 0     && x_cnt <= 479  && y_cnt >= 0   && y_cnt <= 269  && img_hs;
+assign window1  = x_cnt >= 480   && x_cnt <= 959  && y_cnt >= 0   && y_cnt <= 269  && img_hs;
+assign window2  = x_cnt >= 960   && x_cnt <= 1439 && y_cnt >= 0   && y_cnt <= 269  && img_hs;
+assign window3  = x_cnt >= 1440  && x_cnt <= 1919 && y_cnt >= 0   && y_cnt <= 269  && img_hs;
+assign window4  = x_cnt >= 0     && x_cnt <= 479  && y_cnt >= 270 && y_cnt <= 539  && img_hs;
+assign window5  = x_cnt >= 480   && x_cnt <= 959  && y_cnt >= 270 && y_cnt <= 539  && img_hs;
+assign window6  = x_cnt >= 960   && x_cnt <= 1439 && y_cnt >= 270 && y_cnt <= 539  && img_hs;
+assign window7  = x_cnt >= 1440  && x_cnt <= 1919 && y_cnt >= 270 && y_cnt <= 539  && img_hs;
+assign window8  = x_cnt >= 0     && x_cnt <= 479  && y_cnt >= 540 && y_cnt <= 809  && img_hs;
+assign window9  = x_cnt >= 480   && x_cnt <= 959  && y_cnt >= 540 && y_cnt <= 809  && img_hs;
+assign window10 = x_cnt >= 960   && x_cnt <= 1439 && y_cnt >= 540 && y_cnt <= 809  && img_hs;
+assign window11 = x_cnt >= 1440  && x_cnt <= 1919 && y_cnt >= 540 && y_cnt <= 809  && img_hs;
+assign window12 = x_cnt >= 0     && x_cnt <= 479  && y_cnt >= 810 && y_cnt <= 1079 && img_hs;
+assign window13 = x_cnt >= 480   && x_cnt <= 959  && y_cnt >= 810 && y_cnt <= 1079 && img_hs;
+assign window14 = x_cnt >= 960   && x_cnt <= 1439 && y_cnt >= 810 && y_cnt <= 1079 && img_hs;
+assign window15 = x_cnt >= 1440  && x_cnt <= 1919 && y_cnt >= 810 && y_cnt <= 1079 && img_hs;
+
+reg [31:0] hist0_overflow;
+reg [31:0] hist1_overflow;
+reg [31:0] hist2_overflow;
+reg [31:0] hist3_overflow;
+reg [31:0] hist4_overflow;
+reg [31:0] hist5_overflow;
+reg [31:0] hist6_overflow;
+reg [31:0] hist7_overflow;
+reg [31:0] hist8_overflow;
+reg [31:0] hist9_overflow;
+reg [31:0] hist10_overflow;
+reg [31:0] hist11_overflow;
+reg [31:0] hist12_overflow;
+reg [31:0] hist13_overflow;
+reg [31:0] hist14_overflow;
+reg [31:0] hist15_overflow;
+reg [31:0] hist0_overflow_reg;
+reg [31:0] hist1_overflow_reg;
+reg [31:0] hist2_overflow_reg;
+reg [31:0] hist3_overflow_reg;
+reg [31:0] hist4_overflow_reg;
+reg [31:0] hist5_overflow_reg;
+reg [31:0] hist6_overflow_reg;
+reg [31:0] hist7_overflow_reg;
+reg [31:0] hist8_overflow_reg;
+reg [31:0] hist9_overflow_reg;
+reg [31:0] hist10_overflow_reg;
+reg [31:0] hist11_overflow_reg;
+reg [31:0] hist12_overflow_reg;
+reg [31:0] hist13_overflow_reg;
+reg [31:0] hist14_overflow_reg;
+reg [31:0] hist15_overflow_reg;
+
+reg [15:0] hist0_ram [0:255];
+reg [15:0] hist1_ram [0:255];
+reg [15:0] hist2_ram [0:255];
+reg [15:0] hist3_ram [0:255];
+reg [15:0] hist4_ram [0:255];
+reg [15:0] hist5_ram [0:255];
+reg [15:0] hist6_ram [0:255];
+reg [15:0] hist7_ram [0:255];
+reg [15:0] hist8_ram [0:255];
+reg [15:0] hist9_ram [0:255];
+reg [15:0] hist10_ram [0:255];
+reg [15:0] hist11_ram [0:255];
+reg [15:0] hist12_ram [0:255];
+reg [15:0] hist13_ram [0:255];
+reg [15:0] hist14_ram [0:255];
+reg [15:0] hist15_ram [0:255];
+
+reg [15:0] hist0_reg [0:255];
+reg [15:0] hist1_reg [0:255];
+reg [15:0] hist2_reg [0:255];
+reg [15:0] hist3_reg [0:255];
+reg [15:0] hist4_reg [0:255];
+reg [15:0] hist5_reg [0:255];
+reg [15:0] hist6_reg [0:255];
+reg [15:0] hist7_reg [0:255];
+reg [15:0] hist8_reg [0:255];
+reg [15:0] hist9_reg [0:255];
+reg [15:0] hist10_reg [0:255];
+reg [15:0] hist11_reg [0:255];
+reg [15:0] hist12_reg [0:255];
+reg [15:0] hist13_reg [0:255];
+reg [15:0] hist14_reg [0:255];
+reg [15:0] hist15_reg [0:255];
+
+
+reg [15:0] cdf0_ram [0:255];   // CDF
+reg [15:0] cdf1_ram [0:255];
+reg [15:0] cdf2_ram [0:255];
+reg [15:0] cdf3_ram [0:255];
+reg [15:0] cdf4_ram [0:255];
+reg [15:0] cdf5_ram [0:255];
+reg [15:0] cdf6_ram [0:255];
+reg [15:0] cdf7_ram [0:255];
+reg [15:0] cdf8_ram [0:255];
+reg [15:0] cdf9_ram [0:255];
+reg [15:0] cdf10_ram [0:255];
+reg [15:0] cdf11_ram [0:255];
+reg [15:0] cdf12_ram [0:255];
+reg [15:0] cdf13_ram [0:255];
+reg [15:0] cdf14_ram [0:255];
+reg [15:0] cdf15_ram [0:255];
+
+reg [15:0] inte0_ram [0:255];   // results
+reg [15:0] inte1_ram [0:255];
+reg [15:0] inte2_ram [0:255];
+reg [15:0] inte3_ram [0:255];
+reg [15:0] inte4_ram [0:255];
+reg [15:0] inte5_ram [0:255];
+reg [15:0] inte6_ram [0:255];
+reg [15:0] inte7_ram [0:255];
+reg [15:0] inte8_ram [0:255];
+reg [15:0] inte9_ram [0:255];
+reg [15:0] inte10_ram [0:255];
+reg [15:0] inte11_ram [0:255];
+reg [15:0] inte12_ram [0:255];
+reg [15:0] inte13_ram [0:255];
+reg [15:0] inte14_ram [0:255];
+reg [15:0] inte15_ram [0:255];
+   
+reg [31:0] acc0_ram [0:255];  //ACC
+reg [31:0] acc1_ram [0:255];
+reg [31:0] acc2_ram [0:255];
+reg [31:0] acc3_ram [0:255];
+reg [31:0] acc4_ram [0:255];
+reg [31:0] acc5_ram [0:255];
+reg [31:0] acc6_ram [0:255];
+reg [31:0] acc7_ram [0:255];
+reg [31:0] acc8_ram [0:255];
+reg [31:0] acc9_ram [0:255];
+reg [31:0] acc10_ram [0:255];
+reg [31:0] acc11_ram [0:255];
+reg [31:0] acc12_ram [0:255];
+reg [31:0] acc13_ram [0:255];
+reg [31:0] acc14_ram [0:255];
+reg [31:0] acc15_ram [0:255];
+
+
+reg [31:0] acc0 ;  //ACC
+reg [31:0] acc1 ;
+reg [31:0] acc2 ;
+reg [31:0] acc3 ;
+reg [31:0] acc4 ;
+reg [31:0] acc5 ;
+reg [31:0] acc6 ;
+reg [31:0] acc7 ;
+reg [31:0] acc8 ;
+reg [31:0] acc9 ;
+reg [31:0] acc10;
+reg [31:0] acc11;
+reg [31:0] acc12;
+reg [31:0] acc13;
+reg [31:0] acc14;
+reg [31:0] acc15;
+
+reg [7:0] img_y_1d;
+reg [7:0] img_y_2d;
+reg [7:0] img_y_3d;
+reg [7:0] img_y_4d;
+reg [7:0] img_y_5d;
+reg [7:0] img_y_6d;
+
+always@(posedge i_clk) 
+begin 
+	if(rst)begin  
+		img_vs_1d <= 'd0;
+		img_vs_2d <= 'd0;
+	    img_vs_3d <= 'd0;
+		img_vs_4d <= 'd0;
+        img_vs_5d <= 'd0;
+		img_hs_d  <= 'd0;
+        img_vs_d  <= 'd0;
+
+		img_y_1d  <= 'd0;
+        img_y_2d  <= 'd0;
+        img_y_3d  <= 'd0;
+        img_y_4d  <= 'd0;
+        img_y_5d  <= 'd0;
+        img_y_6d  <= 'd0;
+
+	end else begin
+		img_vs_1d <= img_vs;
+		img_vs_2d <= img_vs_1d;
+        img_vs_3d <= img_vs_2d;
+		img_vs_4d <= img_vs_3d;
+        img_vs_5d <= img_vs_4d;
+
+		img_hs_d <= { img_hs_d[298:0] , img_hs};
+		img_vs_d <= { img_vs_d[298:0] , img_vs};
+
+		img_y_1d <=  img_y    ;
+        img_y_2d <=  img_y_1d ;
+        img_y_3d <=  img_y_2d ;
+        img_y_4d <=  img_y_3d ;
+        img_y_5d <=  img_y_4d ;
+        img_y_6d <=  img_y_5d ;
+	end
+end 
+
+always@(posedge i_clk) 
+begin 
+	if(rst)  
+		img_hs_1d <= 'd0;	
+	else 
+		img_hs_1d <= img_hs;
+end 
+
+always@(posedge i_clk) 
+begin 
+	if(rst)  
+		x_cnt <= 'd0;	
+	else if(img_hs)
+		x_cnt <= x_cnt + 1;
+	else 
+		x_cnt <= 'd0;
+end 
+
+always@(posedge i_clk) 
+begin 
+	if(rst)  
+		y_cnt <= 'd0;
+	else if(!img_vs)
+		y_cnt <= 'd0;
+	else if(img_hs_1d && !img_hs)
+		y_cnt <= y_cnt + 1;
+	else 
+		y_cnt <= y_cnt;
+end 
+
+always @(posedge i_clk) 
+begin 
+	if(i_rst) 
+		i <= 'd0;
+	else if(i == 256)
+		i <= 'd256;
+	else 
+		i <= i + 1;
+end
+
+reg [8:0] hist_ram_zero_cnt = 0;
+reg       hist_ram_zero_flag = 0;
+reg [8:0] hist_reg_zero_cnt = 0;
+reg       hist_reg_zero_flag = 0; 
+reg [8:0] cdf_ram_zero_cnt = 0;
+reg       cdf_ram_zero_flag = 0;
+reg [8:0] min_cdf_zero_cnt = 0;
+reg       min_cdf_zero_flag = 0;
+reg [8:0] acc_ram_zero_cnt = 0;
+reg       acc_ram_zero_flag = 0;
+reg [8:0] acc_init_zero_cnt = 0;
+reg       acc_init_zero_flag = 0;
+reg [8:0] results_ram_zero_cnt = 0;
+reg       results_ram_zero_flag = 0;
+
+reg [8:0] inte_ram_zero_cnt = 0;
+reg       inte_ram_zero_flag = 0;
+
+reg       results_ram_zero_flag_1d;
+
+reg [8:0] hist_ram_zero_cnt_1d ;
+reg       hist_ram_zero_flag_1d;
+reg [8:0] hist_reg_zero_cnt_1d ;
+reg       hist_reg_zero_flag_1d; 
+reg [8:0] cdf_ram_zero_cnt_1d  ;
+reg       cdf_ram_zero_flag_1d ;
+reg       min_cdf_zero_flag_1d ;
+reg       acc_ram_zero_flag_1d ;
+reg [8:0] acc_ram_zero_cnt_1d ;
+always @(posedge i_clk) 
+begin 
+	hist_ram_zero_flag_1d <= hist_ram_zero_flag      ;
+	hist_ram_zero_cnt_1d  <= hist_ram_zero_cnt       ;
+	hist_reg_zero_cnt_1d  <= hist_reg_zero_cnt       ;
+    hist_reg_zero_flag_1d <= hist_reg_zero_flag      ;
+    cdf_ram_zero_cnt_1d   <= cdf_ram_zero_cnt        ;
+    cdf_ram_zero_flag_1d  <= cdf_ram_zero_flag       ;
+    min_cdf_zero_flag_1d  <= min_cdf_zero_flag       ; 
+	results_ram_zero_flag_1d <= results_ram_zero_flag;
+	acc_ram_zero_flag_1d  <= acc_ram_zero_flag;
+	acc_ram_zero_cnt_1d  <= acc_ram_zero_cnt;
+end
+
+//------------------------------------------------------
+always @(posedge i_clk) 
+begin 
+	if(img_vs_1d && !img_vs) 
+		hist_ram_zero_flag <= 'd1;
+	else if(hist_ram_zero_cnt == 255 && hist_ram_zero_flag)
+		hist_ram_zero_flag <= 'd0;
+	else 
+		hist_ram_zero_flag <= hist_ram_zero_flag;
+end
+
+always @(posedge i_clk) 
+begin 
+	if(hist_ram_zero_cnt == 255 && hist_ram_zero_flag) 
+		hist_ram_zero_cnt <= 'd0;
+	else if(hist_ram_zero_flag)
+		hist_ram_zero_cnt <= hist_ram_zero_cnt + 1;
+	else 
+		hist_ram_zero_cnt <= hist_ram_zero_cnt;
+end
+//--------------------------------------------------------
+always @(posedge i_clk) 
+begin 
+	if(hist_ram_zero_flag_1d && !hist_ram_zero_flag) 
+		cdf_ram_zero_flag <= 'd1;
+	else if(cdf_ram_zero_cnt == 255 && cdf_ram_zero_flag)
+		cdf_ram_zero_flag <= 'd0;
+	else 
+		cdf_ram_zero_flag <= cdf_ram_zero_flag;
+end
+
+always @(posedge i_clk) 
+begin 
+	if(cdf_ram_zero_cnt == 255 && cdf_ram_zero_flag) 
+		cdf_ram_zero_cnt <= 'd0;
+	else if(cdf_ram_zero_flag)
+		cdf_ram_zero_cnt <= cdf_ram_zero_cnt + 1;
+	else 
+		cdf_ram_zero_cnt <= cdf_ram_zero_cnt;
+end
+//--------------------------------------------------------
+always @(posedge i_clk) 
+begin 
+	if(cdf_ram_zero_flag_1d && !cdf_ram_zero_flag) 
+		min_cdf_zero_flag <= 'd1;
+	else if(min_cdf_zero_cnt == 255 && min_cdf_zero_flag)
+		min_cdf_zero_flag <= 'd0;
+	else 
+		min_cdf_zero_flag <= min_cdf_zero_flag;
+end
+
+always @(posedge i_clk) 
+begin 
+	if(min_cdf_zero_cnt == 255 && min_cdf_zero_flag) 
+		min_cdf_zero_cnt <= 'd0;
+	else if(min_cdf_zero_flag)
+		min_cdf_zero_cnt <= min_cdf_zero_cnt + 1;
+	else 
+		min_cdf_zero_cnt <= min_cdf_zero_cnt;
+end
+//--------------------------------------------------------
+always @(posedge i_clk) 
+begin 
+	if(min_cdf_zero_flag_1d && !min_cdf_zero_flag) 
+		acc_ram_zero_flag <= 'd1;
+	else if(acc_ram_zero_cnt == 255 && acc_ram_zero_flag)
+		acc_ram_zero_flag <= 'd0;
+	else 
+		acc_ram_zero_flag <= acc_ram_zero_flag;
+end
+
+always @(posedge i_clk) 
+begin 
+	if(acc_ram_zero_cnt == 255 && acc_ram_zero_flag) 
+		acc_ram_zero_cnt <= 'd0;
+	else if(acc_ram_zero_flag)
+		acc_ram_zero_cnt <= acc_ram_zero_cnt + 1;
+	else 
+		acc_ram_zero_cnt <= acc_ram_zero_cnt;
+end
+//------------------------------------------------
+always @(posedge i_clk) 
+begin 
+	if(acc_ram_zero_flag_1d && !acc_ram_zero_flag) 
+		results_ram_zero_flag <= 'd1;
+	else if(results_ram_zero_cnt == 255 && results_ram_zero_flag)
+		results_ram_zero_flag <= 'd0;
+	else 
+		results_ram_zero_flag <= results_ram_zero_flag;
+end
+
+always @(posedge i_clk) 
+begin 
+	if(results_ram_zero_cnt == 255 && results_ram_zero_flag) 
+		results_ram_zero_cnt <= 'd0;
+	else if(results_ram_zero_flag)
+		results_ram_zero_cnt <= results_ram_zero_cnt + 1;
+	else 
+		results_ram_zero_cnt <= results_ram_zero_cnt;
+end
+
+//----------------------------------------------------------------
+always @(posedge i_clk) 
+begin 
+	if(results_ram_zero_flag_1d && !results_ram_zero_flag) 
+		acc_init_zero_flag <= 'd1;
+	else if(acc_init_zero_cnt == 255 && acc_init_zero_flag)
+		acc_init_zero_flag <= 'd0;
+	else 
+		acc_init_zero_flag <= acc_init_zero_flag;
+end
+
+always @(posedge i_clk) 
+begin 
+	if(acc_init_zero_cnt == 255 && acc_init_zero_flag) 
+		acc_init_zero_cnt <= 'd0;
+	else if(acc_init_zero_flag)
+		acc_init_zero_cnt <= acc_init_zero_cnt + 1;
+	else 
+		acc_init_zero_cnt <= acc_init_zero_cnt;
+end
+//----------------------------------------------------------------
+// 直方图统计模�? 
+
+//square 0
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist0_overflow <= 'd0;
+	end else if(rst)begin
+            hist0_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist0_overflow <= 'd0;
+            hist0_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if (hist0_ram[img_y] < Clip_limit && window0) 
+				hist0_ram[img_y] <= hist0_ram[img_y] + 1;
+			else if(hist0_ram[img_y] >= Clip_limit && window0)
+				hist0_overflow <= hist0_overflow + 1;
+			end
+	end
+end 
+
+//square 1
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist1_overflow <= 'd0;
+	end else if(rst)begin
+            hist1_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist1_overflow <= 'd0;
+            hist1_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if (hist1_ram[img_y] < Clip_limit && window1) 
+				hist1_ram[img_y] <= hist1_ram[img_y] + 1;
+			else if(hist1_ram[img_y] >= Clip_limit && window1)
+				hist1_overflow <= hist1_overflow + 1;
+			end
+	end
+end  
+
+//square 2
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist2_overflow <= 'd0;
+	end else if(rst)begin
+            hist2_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist2_overflow <= 'd0;
+            hist2_ram[hist_ram_zero_cnt] <= 9'd0;  
+    end else begin
+		if (hist2_ram[img_y] < Clip_limit && window2) 
+            hist2_ram[img_y] <= hist2_ram[img_y] + 1;
+        else if(hist2_ram[img_y] >= Clip_limit && window2)
+            hist2_overflow <= hist2_overflow + 1; 
+	end
+	end
+end
+
+//square 3
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist3_overflow <= 'd0;
+	end else if(rst)begin
+            hist3_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist3_overflow <= 'd0;
+            hist3_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if (hist3_ram[img_y] < Clip_limit && window3) 
+				hist3_ram[img_y] <= hist3_ram[img_y] + 1;
+			else if(hist3_ram[img_y] >= Clip_limit && window3)
+				hist3_overflow <= hist3_overflow + 1;
+			end
+	end
+end 
+
+//square 4
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist4_overflow <= 'd0;
+	end else if(rst)begin
+            hist4_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist4_overflow <= 'd0;
+            hist4_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if (hist4_ram[img_y] < Clip_limit && window4) 
+				hist4_ram[img_y] <= hist4_ram[img_y] + 1;
+			else if(hist4_ram[img_y] >= Clip_limit && window4)
+				hist4_overflow <= hist4_overflow + 1;
+			end
+	end
+end 
+
+//square 5
+always@(posedge i_clk) 
+begin 
+	if (i_rst) begin 
+		hist4_overflow <= 'd0;
+	end else if(rst) begin 
+		hist5_overflow <= 'd0;
+        hist5_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist5_overflow <= 'd0;
+            hist5_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if(hist5_ram[img_y] < Clip_limit && window5) 
+				hist5_ram[img_y] <= hist5_ram[img_y] + 1;
+			else if(hist5_ram[img_y] >= Clip_limit && window5)
+				hist5_overflow <= hist5_overflow + 1;
+		end
+	end
+end		
+		
+//square 6
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist6_overflow <= 'd0;
+	end else if(rst)begin
+            hist6_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist6_overflow <= 'd0;
+            hist6_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if (hist6_ram[img_y] < Clip_limit && window6) 
+				hist6_ram[img_y] <= hist6_ram[img_y] + 1;
+			else if(hist6_ram[img_y] >= Clip_limit && window6)
+				hist6_overflow <= hist6_overflow + 1;
+			end
+	end
+end 
+//square 7
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist7_overflow <= 'd0;
+	end else if(rst)begin
+            hist7_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist7_overflow <= 'd0;
+            hist7_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if (hist7_ram[img_y] < Clip_limit && window7) 
+				hist7_ram[img_y] <= hist7_ram[img_y] + 1;
+			else if(hist7_ram[img_y] >= Clip_limit && window7)
+				hist7_overflow <= hist7_overflow + 1;
+			end
+	end
+end 
+
+//square 8
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist8_overflow <= 'd0;
+	end else if(rst)begin
+            hist8_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist8_overflow <= 'd0;
+            hist8_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if (hist8_ram[img_y] < Clip_limit && window8) 
+				hist8_ram[img_y] <= hist8_ram[img_y] + 1;
+			else if(hist8_ram[img_y] >= Clip_limit && window8)
+				hist8_overflow <= hist8_overflow + 1;
+			end
+	end
+end 
+
+//square 9
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist9_overflow <= 'd0;
+	end else if(rst)begin
+            hist9_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist9_overflow <= 'd0;
+            hist9_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if (hist9_ram[img_y] < Clip_limit && window9) 
+				hist9_ram[img_y] <= hist9_ram[img_y] + 1;
+			else if(hist9_ram[img_y] >= Clip_limit && window9)
+				hist9_overflow <= hist9_overflow + 1;
+			end
+	end
+end 
+
+//square 10
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist10_overflow <= 'd0;
+	end else if(rst)begin
+            hist10_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist10_overflow <= 'd0;
+            hist10_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if (hist10_ram[img_y] < Clip_limit && window10) 
+				hist10_ram[img_y] <= hist10_ram[img_y] + 1;
+			else if(hist10_ram[img_y] >= Clip_limit && window10)
+				hist10_overflow <= hist10_overflow + 1;
+			end
+	end
+end 
+
+//square 11
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist11_overflow <= 'd0;
+	end else if(rst)begin
+            hist11_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist11_overflow <= 'd0;
+            hist11_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if (hist11_ram[img_y] < Clip_limit && window11) 
+				hist11_ram[img_y] <= hist11_ram[img_y] + 1;
+			else if(hist11_ram[img_y] >= Clip_limit && window11)
+				hist11_overflow <= hist11_overflow + 1;
+			end
+	end
+end 
+
+//square 12
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist12_overflow <= 'd0;
+	end else if(rst)begin
+            hist12_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist12_overflow <= 'd0;
+            hist12_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if (hist12_ram[img_y] < Clip_limit && window12) 
+				hist12_ram[img_y] <= hist12_ram[img_y] + 1;
+			else if(hist12_ram[img_y] >= Clip_limit && window12)
+				hist12_overflow <= hist12_overflow + 1;
+			end
+	end
+end 
+
+//square 13
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist13_overflow <= 'd0;
+	end else if(rst)begin
+            hist13_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist13_overflow <= 'd0;
+            hist13_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if (hist13_ram[img_y] < Clip_limit && window13) 
+				hist13_ram[img_y] <= hist13_ram[img_y] + 1;
+			else if(hist13_ram[img_y] >= Clip_limit && window13)
+				hist13_overflow <= hist13_overflow + 1;
+			end
+	end
+end 
+
+//square 14
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist14_overflow <= 'd0;
+	end else if(rst)begin
+            hist14_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist14_overflow <= 'd0;
+            hist14_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if (hist14_ram[img_y] < Clip_limit && window14) 
+				hist14_ram[img_y] <= hist14_ram[img_y] + 1;
+			else if(hist14_ram[img_y] >= Clip_limit && window14)
+				hist14_overflow <= hist14_overflow + 1;
+			end
+	end
+end 
+
+//square 15
+always @(posedge i_clk) 
+begin 
+    if (i_rst) begin 
+		hist15_overflow <= 'd0;
+	end else if(rst)begin
+            hist15_ram[i] <= 9'd0; 
+    end else begin
+		if(hist_ram_zero_flag)begin 
+			hist15_overflow <= 'd0;
+            hist15_ram[hist_ram_zero_cnt] <= 9'd0;  
+		end else begin
+			if (hist15_ram[img_y] < Clip_limit && window15) 
+				hist15_ram[img_y] <= hist15_ram[img_y] + 1;
+			else if(hist15_ram[img_y] >= Clip_limit && window15)
+				hist15_overflow <= hist15_overflow + 1;
+			end
+	end
+end 
+
+//数据寄存模块
+always @(posedge i_clk) 
+begin
+	if(rst)begin
+		hist0_overflow_reg <= 'd0;
+		hist1_overflow_reg <= 'd0;
+		hist2_overflow_reg <= 'd0;
+		hist3_overflow_reg <= 'd0;
+		hist4_overflow_reg <= 'd0;
+		hist5_overflow_reg <= 'd0;
+		hist6_overflow_reg <= 'd0;
+		hist7_overflow_reg <= 'd0;
+		hist8_overflow_reg <= 'd0;
+		hist9_overflow_reg <= 'd0;
+		hist10_overflow_reg <= 'd0;
+		hist11_overflow_reg <= 'd0;
+		hist12_overflow_reg <= 'd0;
+		hist13_overflow_reg <= 'd0;
+		hist14_overflow_reg <= 'd0;
+		hist15_overflow_reg <= 'd0;
+	end else if(img_vs_1d && !img_vs)begin
+		hist0_overflow_reg <= hist0_overflow;
+		hist1_overflow_reg <= hist1_overflow;
+		hist2_overflow_reg <= hist2_overflow;
+		hist3_overflow_reg <= hist3_overflow;
+		hist4_overflow_reg <= hist4_overflow;
+		hist5_overflow_reg <= hist5_overflow;
+		hist6_overflow_reg <= hist6_overflow;
+		hist7_overflow_reg <= hist7_overflow;
+		hist8_overflow_reg <= hist8_overflow;
+		hist9_overflow_reg <= hist9_overflow;
+		hist10_overflow_reg <= hist10_overflow;
+		hist11_overflow_reg <= hist11_overflow;
+		hist12_overflow_reg <= hist12_overflow;
+		hist13_overflow_reg <= hist13_overflow;
+		hist14_overflow_reg <= hist14_overflow;
+		hist15_overflow_reg <= hist15_overflow;   
+	end
+end		
+ 
+//-----------------------------------------------------------------------------------------
+//数据寄存模块
+always @(posedge i_clk) 
+begin
+	if(rst)begin
+		hist0_reg[i]  <= 16'd0;
+		hist1_reg[i]  <= 16'd0;
+		hist2_reg[i]  <= 16'd0;
+		hist3_reg[i]  <= 16'd0;
+		hist4_reg[i]  <= 16'd0;
+		hist5_reg[i]  <= 16'd0;
+		hist6_reg[i]  <= 16'd0;
+		hist7_reg[i]  <= 16'd0;
+		hist8_reg[i]  <= 16'd0;
+		hist9_reg[i]  <= 16'd0;
+		hist10_reg[i] <= 16'd0;
+		hist11_reg[i] <= 16'd0;
+		hist12_reg[i] <= 16'd0;
+		hist13_reg[i] <= 16'd0;
+		hist14_reg[i] <= 16'd0;
+		hist15_reg[i] <= 16'd0;
+	end else begin
+		if(hist_ram_zero_flag)begin 
+			hist0_reg[hist_ram_zero_cnt]  <= hist0_ram[hist_ram_zero_cnt]   ; 
+			hist1_reg[hist_ram_zero_cnt]  <= hist1_ram[hist_ram_zero_cnt]   ;
+			hist2_reg[hist_ram_zero_cnt]  <= hist2_ram[hist_ram_zero_cnt]   ;
+			hist3_reg[hist_ram_zero_cnt]  <= hist3_ram[hist_ram_zero_cnt]   ;
+			hist4_reg[hist_ram_zero_cnt]  <= hist4_ram[hist_ram_zero_cnt]   ;
+			hist5_reg[hist_ram_zero_cnt]  <= hist5_ram[hist_ram_zero_cnt]   ;
+			hist6_reg[hist_ram_zero_cnt]  <= hist6_ram[hist_ram_zero_cnt]   ;
+			hist7_reg[hist_ram_zero_cnt]  <= hist7_ram[hist_ram_zero_cnt]   ;
+			hist8_reg[hist_ram_zero_cnt]  <= hist8_ram[hist_ram_zero_cnt]   ;
+			hist9_reg[hist_ram_zero_cnt]  <= hist9_ram[hist_ram_zero_cnt]   ;
+			hist10_reg[hist_ram_zero_cnt] <= hist10_ram[hist_ram_zero_cnt]  ;
+			hist11_reg[hist_ram_zero_cnt] <= hist11_ram[hist_ram_zero_cnt]  ;
+			hist12_reg[hist_ram_zero_cnt] <= hist12_ram[hist_ram_zero_cnt]  ;
+			hist13_reg[hist_ram_zero_cnt] <= hist13_ram[hist_ram_zero_cnt]  ;
+			hist14_reg[hist_ram_zero_cnt] <= hist14_ram[hist_ram_zero_cnt]  ;
+			hist15_reg[hist_ram_zero_cnt] <= hist15_ram[hist_ram_zero_cnt]  ;     
+		end
+	end
+end		
+
+//-------------------------------------------------------------------------------------------------	
+
+// 对比度限制模�? 
+wire [15:0] redist0;
+wire [15:0] redist1;
+wire [15:0] redist2;
+wire [15:0] redist3;
+wire [15:0] redist4;
+wire [15:0] redist5;
+wire [15:0] redist6;
+wire [15:0] redist7;
+wire [15:0] redist8;
+wire [15:0] redist9;
+wire [15:0] redist10;
+wire [15:0] redist11;
+wire [15:0] redist12;
+wire [15:0] redist13;
+wire [15:0] redist14;
+wire [15:0] redist15;
+assign redist0  = hist0_overflow_reg >>> 8;
+assign redist1  = hist1_overflow_reg >>> 8;
+assign redist2  = hist2_overflow_reg >>> 8;
+assign redist3  = hist3_overflow_reg >>> 8;
+assign redist4  = hist4_overflow_reg >>> 8;
+assign redist5  = hist5_overflow_reg >>> 8;
+assign redist6  = hist6_overflow_reg >>> 8;
+assign redist7  = hist7_overflow_reg >>> 8;
+assign redist8  = hist8_overflow_reg >>> 8;
+assign redist9  = hist9_overflow_reg >>> 8;
+assign redist10 = hist10_overflow_reg >>> 8;
+assign redist11 = hist11_overflow_reg >>> 8;
+assign redist12 = hist12_overflow_reg >>> 8;
+assign redist13 = hist13_overflow_reg >>> 8;
+assign redist14 = hist14_overflow_reg >>> 8;
+assign redist15 = hist15_overflow_reg >>> 8;
+
+always @(posedge i_clk) 
+begin
+	if(rst)begin
+			cdf0_ram[i]  <= 9'd0;
+			cdf1_ram[i]  <= 9'd0;
+			cdf2_ram[i]  <= 9'd0;
+			cdf3_ram[i]  <= 9'd0;
+			cdf4_ram[i]  <= 9'd0;
+			cdf5_ram[i]  <= 9'd0;
+			cdf6_ram[i]  <= 9'd0;
+			cdf7_ram[i]  <= 9'd0;
+			cdf8_ram[i]  <= 9'd0;
+			cdf9_ram[i]  <= 9'd0;
+			cdf10_ram[i] <= 9'd0;
+			cdf11_ram[i] <= 9'd0;
+			cdf12_ram[i] <= 9'd0;
+			cdf13_ram[i] <= 9'd0;
+			cdf14_ram[i] <= 9'd0;
+			cdf15_ram[i] <= 9'd0;
+	end else if(acc_init_zero_flag)begin
+			cdf0_ram[acc_init_zero_cnt] <= 'd0;
+            cdf1_ram[acc_init_zero_cnt] <= 'd0;
+            cdf2_ram[acc_init_zero_cnt] <= 'd0;
+            cdf3_ram[acc_init_zero_cnt] <= 'd0;
+            cdf4_ram[acc_init_zero_cnt] <= 'd0;
+            cdf5_ram[acc_init_zero_cnt] <= 'd0;
+            cdf6_ram[acc_init_zero_cnt] <= 'd0;
+            cdf7_ram[acc_init_zero_cnt] <= 'd0;
+            cdf8_ram[acc_init_zero_cnt] <= 'd0;
+            cdf9_ram[acc_init_zero_cnt] <= 'd0;
+           cdf10_ram[acc_init_zero_cnt] <= 'd0;
+           cdf11_ram[acc_init_zero_cnt] <= 'd0;
+           cdf12_ram[acc_init_zero_cnt] <= 'd0;
+           cdf13_ram[acc_init_zero_cnt] <= 'd0;
+           cdf14_ram[acc_init_zero_cnt] <= 'd0;
+           cdf15_ram[acc_init_zero_cnt] <= 'd0;
+	end else if(cdf_ram_zero_flag)begin
+		 // 重新分配溢出像素 
+            cdf0_ram[cdf_ram_zero_cnt] <= hist0_reg[cdf_ram_zero_cnt] +   redist0  ;
+			cdf1_ram[cdf_ram_zero_cnt] <= hist1_reg[cdf_ram_zero_cnt] +   redist1  ;
+			cdf2_ram[cdf_ram_zero_cnt] <= hist2_reg[cdf_ram_zero_cnt] +   redist2  ;
+			cdf3_ram[cdf_ram_zero_cnt] <= hist3_reg[cdf_ram_zero_cnt] +   redist3  ;
+			cdf4_ram[cdf_ram_zero_cnt] <= hist4_reg[cdf_ram_zero_cnt] +   redist4  ;
+			cdf5_ram[cdf_ram_zero_cnt] <= hist5_reg[cdf_ram_zero_cnt] +   redist5  ;
+            cdf6_ram[cdf_ram_zero_cnt] <= hist6_reg[cdf_ram_zero_cnt] +   redist6  ;
+            cdf7_ram[cdf_ram_zero_cnt] <= hist7_reg[cdf_ram_zero_cnt] +   redist7  ;
+            cdf8_ram[cdf_ram_zero_cnt] <= hist8_reg[cdf_ram_zero_cnt] +   redist8  ;
+            cdf9_ram[cdf_ram_zero_cnt] <= hist9_reg[cdf_ram_zero_cnt] +   redist9  ;
+			cdf10_ram[cdf_ram_zero_cnt] <= hist10_reg[cdf_ram_zero_cnt] + redist10;
+            cdf11_ram[cdf_ram_zero_cnt] <= hist11_reg[cdf_ram_zero_cnt] + redist11;
+            cdf12_ram[cdf_ram_zero_cnt] <= hist12_reg[cdf_ram_zero_cnt] + redist12;
+            cdf13_ram[cdf_ram_zero_cnt] <= hist13_reg[cdf_ram_zero_cnt] + redist13;
+            cdf14_ram[cdf_ram_zero_cnt] <= hist14_reg[cdf_ram_zero_cnt] + redist14;
+			cdf15_ram[cdf_ram_zero_cnt] <= hist15_reg[cdf_ram_zero_cnt] + redist15;
+	end
+end 
+always @(posedge i_clk)
+begin
+	if(rst)begin
+		acc0  <= 9'd0;
+		acc1  <= 9'd0;
+		acc2  <= 9'd0;
+		acc3  <= 9'd0;
+		acc4  <= 9'd0;
+		acc5  <= 9'd0;
+		acc6  <= 9'd0;
+		acc7  <= 9'd0;
+		acc8  <= 9'd0;
+		acc9  <= 9'd0;
+		acc10  <= 9'd0;
+		acc11  <= 9'd0;
+		acc12  <= 9'd0;
+		acc13  <= 9'd0;
+		acc14  <= 9'd0;
+		acc15  <= 9'd0;
+	end else if(acc_init_zero_flag)begin
+		acc0 <= 9'd0;
+		acc1 <= 9'd0;
+		acc2 <= 9'd0;
+		acc3 <= 9'd0;
+		acc4 <= 9'd0;
+		acc5 <= 9'd0;
+		acc6 <= 9'd0;
+		acc7 <= 9'd0;
+		acc8 <= 9'd0;
+		acc9 <= 9'd0;
+		acc10 <= 9'd0;
+		acc11 <= 9'd0;
+		acc12 <= 9'd0;
+		acc13 <= 9'd0;
+		acc14 <= 9'd0;
+		acc15 <= 9'd0;
+	end else if(acc_ram_zero_flag)begin
+		acc0 <= acc0 + cdf0_ram[acc_ram_zero_cnt];
+		acc1 <= acc1 + cdf1_ram[acc_ram_zero_cnt];
+		acc2 <= acc2 + cdf2_ram[acc_ram_zero_cnt];
+		acc3 <= acc3 + cdf3_ram[acc_ram_zero_cnt];
+		acc4 <= acc4 + cdf4_ram[acc_ram_zero_cnt];
+		acc5 <= acc5 + cdf5_ram[acc_ram_zero_cnt];
+        acc6 <= acc6 + cdf6_ram[acc_ram_zero_cnt];
+        acc7 <= acc7 + cdf7_ram[acc_ram_zero_cnt];
+        acc8 <= acc8 + cdf8_ram[acc_ram_zero_cnt];
+        acc9 <= acc9 + cdf9_ram[acc_ram_zero_cnt];
+		acc10 <= acc10 + cdf10_ram[acc_ram_zero_cnt];
+        acc11 <= acc11 + cdf11_ram[acc_ram_zero_cnt];
+        acc12 <= acc12 + cdf12_ram[acc_ram_zero_cnt];
+        acc13 <= acc13 + cdf13_ram[acc_ram_zero_cnt];
+        acc14 <= acc14 + cdf14_ram[acc_ram_zero_cnt];
+		acc15 <= acc15 + cdf15_ram[acc_ram_zero_cnt];
+	end
+end
+
+always @(posedge i_clk)
+begin
+	if(acc_ram_zero_flag_1d)begin
+		acc0_ram[acc_ram_zero_cnt_1d]  <= acc0  * 255 * 8 >>> 20;
+		acc1_ram[acc_ram_zero_cnt_1d]  <= acc1  * 255 * 8 >>> 20;
+		acc2_ram[acc_ram_zero_cnt_1d]  <= acc2  * 255 * 8 >>> 20;
+		acc3_ram[acc_ram_zero_cnt_1d]  <= acc3  * 255 * 8 >>> 20;
+		acc4_ram[acc_ram_zero_cnt_1d]  <= acc4  * 255 * 8 >>> 20;
+		acc5_ram[acc_ram_zero_cnt_1d]  <= acc5  * 255 * 8 >>> 20;
+        acc6_ram[acc_ram_zero_cnt_1d]  <= acc6  * 255 * 8 >>> 20;
+        acc7_ram[acc_ram_zero_cnt_1d]  <= acc7  * 255 * 8 >>> 20;
+        acc8_ram[acc_ram_zero_cnt_1d]  <= acc8  * 255 * 8 >>> 20;
+        acc9_ram[acc_ram_zero_cnt_1d]  <= acc9  * 255 * 8 >>> 20;
+		acc10_ram[acc_ram_zero_cnt_1d] <= acc10 * 255 * 8 >>> 20;
+        acc11_ram[acc_ram_zero_cnt_1d] <= acc11 * 255 * 8 >>> 20;
+        acc12_ram[acc_ram_zero_cnt_1d] <= acc12 * 255 * 8 >>> 20;
+        acc13_ram[acc_ram_zero_cnt_1d] <= acc13 * 255 * 8 >>> 20;
+        acc14_ram[acc_ram_zero_cnt_1d] <= acc14 * 255 * 8 >>> 20;
+		acc15_ram[acc_ram_zero_cnt_1d] <= acc15 * 255 * 8 >>> 20;
+	end
+end
+
+always @(posedge i_clk) 
+begin
+	if(acc_init_zero_flag)begin
+          inte0_ram[acc_init_zero_cnt] <=  acc0_ram[acc_init_zero_cnt] ;
+		  inte1_ram[acc_init_zero_cnt] <=  acc1_ram[acc_init_zero_cnt] ;
+		  inte2_ram[acc_init_zero_cnt] <=  acc2_ram[acc_init_zero_cnt] ;
+		  inte3_ram[acc_init_zero_cnt] <=  acc3_ram[acc_init_zero_cnt] ;
+		  inte4_ram[acc_init_zero_cnt] <=  acc4_ram[acc_init_zero_cnt] ;
+		  inte5_ram[acc_init_zero_cnt] <=  acc5_ram[acc_init_zero_cnt] ;
+		  inte6_ram[acc_init_zero_cnt] <=  acc6_ram[acc_init_zero_cnt] ;
+		  inte7_ram[acc_init_zero_cnt] <=  acc7_ram[acc_init_zero_cnt] ;
+		  inte8_ram[acc_init_zero_cnt] <=  acc8_ram[acc_init_zero_cnt] ;
+          inte9_ram[acc_init_zero_cnt] <=  acc9_ram[acc_init_zero_cnt] ;
+         inte10_ram[acc_init_zero_cnt] <=  acc10_ram[acc_init_zero_cnt] ;
+         inte11_ram[acc_init_zero_cnt] <=  acc11_ram[acc_init_zero_cnt] ;
+         inte12_ram[acc_init_zero_cnt] <=  acc12_ram[acc_init_zero_cnt] ;
+         inte13_ram[acc_init_zero_cnt] <=  acc13_ram[acc_init_zero_cnt] ;
+         inte14_ram[acc_init_zero_cnt] <=  acc14_ram[acc_init_zero_cnt] ;
+         inte15_ram[acc_init_zero_cnt] <=  acc15_ram[acc_init_zero_cnt] ;
+	end                                    
+end 
+
+
+
+//new pixel value cpu part
+wire inte_x0 ;
+wire inte_x1 ;
+wire inte_x2 ;
+
+wire inte_y0 ;
+wire inte_y1 ;
+wire inte_y2 ;
+
+
+
+
+
+
+
+wire inte_window0 ;
+wire inte_window1 ;
+wire inte_window2 ;
+wire inte_window3 ;
+wire inte_window4 ;
+wire inte_window5 ;
+wire inte_window6 ;
+wire inte_window7 ;
+wire inte_window8 ;
+
+
+assign inte_x0 = x_cnt >= 479/2 - 1       && x_cnt <= 479/2 + 479  - 1;
+assign inte_x1 = x_cnt >= 479/2 - 1 + 480 && x_cnt <= 479/2 + 959  - 1;
+assign inte_x2 = x_cnt >= 479/2 - 1 + 960 && x_cnt <= 479/2 + 1439 - 1;
+
+assign inte_y0 = y_cnt >= 269/2        - 1 && y_cnt <= 269/2 + 269  - 1;
+assign inte_y1 = y_cnt >= 269/2  + 270 - 1 && y_cnt <= 269/2 + 539  - 1;
+assign inte_y2 = y_cnt >= 269/2  + 540 - 1 && y_cnt <= 269/2 + 809  - 1;
+assign inte_window0  = x_cnt >= 479/2        - 1 && x_cnt <= 479/2 + 479  - 1 && y_cnt >= 269/2         - 1 && y_cnt <= 269/2 + 269 - 1 && img_hs;
+assign inte_window1  = x_cnt >= 479/2 + 480  - 1 && x_cnt <= 479/2 + 959  - 1 && y_cnt >= 269/2         - 1 && y_cnt <= 269/2 + 269 - 1 && img_hs;
+assign inte_window2  = x_cnt >= 479/2 + 960  - 1 && x_cnt <= 479/2 + 1439 - 1 && y_cnt >= 269/2         - 1 && y_cnt <= 269/2 + 269 - 1 && img_hs;
+assign inte_window3  = x_cnt >= 479/2        - 1 && x_cnt <= 479/2 + 479  - 1 && y_cnt >= 269/2  + 270  - 1 && y_cnt <= 269/2 + 539 - 1 && img_hs;
+assign inte_window4  = x_cnt >= 479/2 + 480  - 1 && x_cnt <= 479/2 + 959  - 1 && y_cnt >= 269/2  + 270  - 1 && y_cnt <= 269/2 + 539 - 1 && img_hs;
+assign inte_window5  = x_cnt >= 479/2 + 960  - 1 && x_cnt <= 479/2 + 1439 - 1 && y_cnt >= 269/2  + 270  - 1 && y_cnt <= 269/2 + 539 - 1 && img_hs;
+assign inte_window6  = x_cnt >= 479/2        - 1 && x_cnt <= 479/2 + 479  - 1 && y_cnt >= 269/2  + 540  - 1 && y_cnt <= 269/2 + 809 - 1 && img_hs;
+assign inte_window7  = x_cnt >= 479/2 + 480  - 1 && x_cnt <= 479/2 + 959  - 1 && y_cnt >= 269/2  + 540  - 1 && y_cnt <= 269/2 + 809 - 1 && img_hs;
+assign inte_window8  = x_cnt >= 479/2 + 960  - 1 && x_cnt <= 479/2 + 1439 - 1 && y_cnt >= 269/2  + 540  - 1 && y_cnt <= 269/2 + 809 - 1 && img_hs;
+
+reg [15:0] centra_cnt_x;
+reg [15:0] centra_cnt_y;
+
+always@(posedge i_clk) 
+begin 
+	if(rst)  
+		centra_cnt_x <= 'd0;	
+	else if( x_cnt == 479/2 || x_cnt == 479/2 + 480 || x_cnt == 479/2 + 960 || x_cnt == 479/2 + 1440)
+		centra_cnt_x <= 'd0;
+	else if(img_hs)
+		centra_cnt_x <= centra_cnt_x  + 1;
+end 
+  
+always@(posedge i_clk) 
+begin 
+	if(rst)  
+		centra_cnt_y <= 'd0;	
+	else if(y_cnt == 269/2 || y_cnt == 269/2 + 270 || y_cnt == 269/2 + 540 || y_cnt == 269/2 + 810)
+		centra_cnt_y <= 'd0;
+	else if(img_hs_1d && !img_hs && img_vs)
+		centra_cnt_y <= centra_cnt_y  + 1;
+end 
+
+reg [8:0] new_Y;
+// 坐标计算 
+wire [10:0] x_in_block;  assign x_in_block = x_cnt % 480;  // 块内X坐标 
+wire [10:0] y_in_block;  assign y_in_block = y_cnt % 270; // 块内Y坐标 
+
+ 
+reg [15:0] dx, dy; // 相对位置权重 
+always @(posedge i_clk) 
+begin
+	if(i_rst)begin
+		dx <= 'd0;
+        dy <= 'd1;
+	end else begin
+		// 计算相对位置权重   4096 Q12	
+		dx <= centra_cnt_x * 8 ; 
+		dy <= centra_cnt_y * 15 + 1;
+	end       
+end 
+
+// 双线性插值流水线 
+reg  [39:0] w00 = 0, w01 = 0,w10 = 0,w11 = 0;
+reg  [39:0] h0 = 0,h1 = 0,v_result = 0;
+reg  [23:0] pixel_out0 = 0;   
+reg  [23:0] pixel_out1 = 0;  
+reg  [23:0] pixel_out2 = 0;
+
+always @(posedge i_clk) begin 
+	if((img_vs))begin
+		if(window0)
+			pixel_out0 <= inte0_ram[img_y];
+		else if(window3)
+			pixel_out0 <= inte3_ram[img_y];
+		else if(window12)
+			pixel_out0 <= inte12_ram[img_y];
+		else if(window15)
+			pixel_out0 <= inte15_ram[img_y];
+	end
+end
+
+wire [8:0] inte_window_en;
+reg [8:0] inte_window_en_1d;
+reg [8:0] inte_window_en_2d;
+reg [8:0] inte_window_en_3d;
+reg [8:0] inte_window_en_4d;
+
+
+assign inte_window_en = {inte_window0,inte_window1,inte_window2,inte_window3,inte_window4,inte_window5,inte_window6,inte_window7,inte_window8};  
+always @(posedge i_clk) begin 
+	inte_window_en_1d <= inte_window_en   ;
+	inte_window_en_2d <= inte_window_en_1d;
+	inte_window_en_3d <= inte_window_en_2d;
+	inte_window_en_4d <= inte_window_en_3d;
+	                    
+end
+
+always @(posedge i_clk) begin 
+	if((img_vs))begin
+		case(inte_window_en)
+				   //0
+					9'b1000_0000_0 :
+					begin    
+						w00 <= dx * dy; 
+						w01 <= (4096 - dx) * dy; 
+						w10 <= dx * (4096 - dy);
+						w11 <=(4096 - dx) * (4096 - dy); 
+					end  
+					//1
+					9'b0100_0000_0 :
+					begin    
+						w00 <= dx * dy; 
+						w01 <= (4096 - dx) * dy; 
+						w10 <= dx * (4096 - dy);
+						w11 <=(4096 - dx) * (4096 - dy); 
+					end
+					//2
+					9'b0010_0000_0 :
+					begin    
+						w00 <= dx * dy; 
+						w01 <= (4096 - dx) * dy; 
+						w10 <= dx * (4096 - dy);
+						w11 <=(4096 - dx) * (4096 - dy); 
+						
+					end
+					//3
+					9'b0001_0000_0:
+					begin    
+						w00 <= dx * dy; 
+						w01 <= (4096 - dx) * dy; 
+						w10 <= dx * (4096 - dy);
+						w11 <=(4096 - dx) * (4096 - dy); 
+						
+					end
+					//4
+					9'b0000_1000_0 :
+					begin    
+						w00 <= dx * dy; 
+						w01 <= (4096 - dx) * dy; 
+						w10 <= dx * (4096 - dy);
+						w11 <=(4096 - dx) * (4096 - dy); 
+							
+					end
+					//5
+					9'b0000_0100_0 :
+					begin    
+						w00 <= dx * dy; 
+						w01 <= (4096 - dx) * dy; 
+						w10 <= dx * (4096 - dy);
+						w11 <=(4096 - dx) * (4096 - dy); 
+						
+					end
+					//6
+					9'b0000_0010_0 :
+					begin    
+						w00 <= dx * dy; 
+						w01 <= (4096 - dx) * dy; 
+						w10 <= dx * (4096 - dy);
+						w11 <=(4096 - dx) * (4096 - dy); 
+						
+					end
+					//7
+					9'b0000_0001_0 :
+					begin    
+						w00 <= dx * dy; 
+						w01 <= (4096 - dx) * dy; 
+						w10 <= dx * (4096 - dy);
+						w11 <=(4096 - dx) * (4096 - dy); 
+						
+					end
+					//8
+					9'b0000_0000_1 :
+					begin    
+						w00 <= dx * dy; 
+						w01 <= (4096 - dx) * dy; 
+						w10 <= dx * (4096 - dy);
+						w11 <=(4096 - dx) * (4096 - dy); 
+						
+					end
+			
+				endcase
+	end 
+end
+
+always @(posedge i_clk) begin 
+	if((img_vs))begin
+		case(inte_window_en_4d)
+				   //0
+					9'b1000_0000_0 :
+					begin    
+						h0 <= inte0_ram[img_y_4d] * w11 + inte1_ram[img_y_4d] * w10;
+						h1 <= inte4_ram[img_y_4d] * w01 + inte5_ram[img_y_4d] * w00;  
+						v_result <= h0 + h1;
+						pixel_out1 <= v_result >> 24;	
+					end
+					//1
+					9'b0100_0000_0 :
+					begin    
+						
+						h0 <= inte1_ram[img_y_4d] * w11 + inte2_ram[img_y_4d] * w10;
+						h1 <= inte5_ram[img_y_4d] * w01 + inte6_ram[img_y_4d] * w00;  
+						v_result <= h0 + h1;
+						pixel_out1 <= v_result >> 24;	
+					end
+					//2
+					9'b0010_0000_0 :
+					begin    
+						
+						h0 <= inte2_ram[img_y_4d] * w11 + inte3_ram[img_y_4d] * w10;
+						h1 <= inte6_ram[img_y_4d] * w01 + inte7_ram[img_y_4d] * w00;   
+						v_result <= h0 + h1;
+						pixel_out1 <= v_result >> 24;	
+					end
+					//3
+					9'b0001_0000_0:
+					begin    
+						
+						h0 <= inte4_ram[img_y_4d] * w11 + inte5_ram[img_y_4d] * w10;
+						h1 <= inte8_ram[img_y_4d] * w01 + inte9_ram[img_y_4d] * w00;   
+						v_result <= h0 + h1;
+						pixel_out1 <= v_result >> 24;	
+					end
+					//4
+					9'b0000_1000_0 :
+					begin    
+						
+						h0 <= inte5_ram[img_y_4d] * w11 + inte6_ram[img_y_4d] * w10;
+						h1 <= inte9_ram[img_y_4d] * w01 + inte10_ram[img_y_4d] * w00;   
+						v_result <= h0 + h1;
+						pixel_out1 <= v_result >> 24;	
+					end
+					//5
+					9'b0000_0100_0 :
+					begin    
+						
+						h0 <= inte6_ram[img_y_4d] * w11 + inte7_ram[img_y_4d] * w10;
+						h1 <= inte10_ram[img_y_4d] * w01 + inte11_ram[img_y_4d] * w00;  
+						v_result <= h0 + h1;
+						pixel_out1 <= v_result >> 24;	
+					end
+					//6
+					9'b0000_0010_0 :
+					begin    
+						
+						h0 <= inte8_ram[img_y_4d] * w11 + inte9_ram[img_y_4d] * w10;
+						h1 <= inte12_ram[img_y_4d] * w01 + inte13_ram[img_y_4d] *w00;   
+						v_result <= h0 + h1;
+						pixel_out1 <= v_result >> 24;	
+					end
+					//7
+					9'b0000_0001_0 :
+					begin    
+						
+						h0 <= inte9_ram[img_y_4d] * w11 + inte10_ram[img_y_4d] * w10;
+						h1 <= inte13_ram[img_y_4d] * w01 + inte14_ram[img_y_4d] *w00;  
+						v_result <= h0 + h1;
+						pixel_out1 <= v_result >> 24;	
+					end
+					//8
+					9'b0000_0000_1 :
+					begin    
+						
+						h0 <= inte10_ram[img_y_4d] * w11 + inte11_ram[img_y_4d] * w10;
+						h1 <= inte14_ram[img_y_4d] * w01 + inte15_ram[img_y_4d] * w00;   
+						v_result <= h0 + h1;
+						pixel_out1 <= v_result >> 24;	
+					end
+			
+				endcase
+					
+
+	end 
+end
+reg  [39:0] w000 = 0, w001 = 0,w010 = 0,w011 = 0;
+reg  [39:0] h01 = 0,v_result0 = 0;
+
+//----------------------------------------------------------------------
+wire [2:0] inte_window_y_en;
+reg  [2:0] inte_window_y_en_1d;
+reg  [2:0] inte_window_y_en_2d;
+reg  [2:0] inte_window_y_en_3d;
+reg  [2:0] inte_window_y_en_4d;
+
+
+assign inte_window_y_en = {inte_y0,inte_y1,inte_y2};  
+always @(posedge i_clk) begin 
+	inte_window_y_en_1d <= inte_window_y_en   ;
+	inte_window_y_en_2d <= inte_window_y_en_1d;
+	inte_window_y_en_3d <= inte_window_y_en_2d;
+	inte_window_y_en_4d <= inte_window_y_en_3d;
+end
+
+wire [2:0] inte_window_x_en;
+reg  [2:0] inte_window_x_en_1d;
+reg  [2:0] inte_window_x_en_2d;
+reg  [2:0] inte_window_x_en_3d;
+reg  [2:0] inte_window_x_en_4d;
+
+
+assign inte_window_x_en = {inte_x0,inte_x1,inte_x2};  
+always @(posedge i_clk) begin 
+	inte_window_x_en_1d <= inte_window_x_en   ;
+	inte_window_x_en_2d <= inte_window_x_en_1d;
+	inte_window_x_en_3d <= inte_window_x_en_2d;
+	inte_window_x_en_4d <= inte_window_x_en_3d;
+end
+
+always @(posedge i_clk) begin 
+	if(img_vs)begin
+		if(x_cnt <= 479/2 + 1)
+			case(inte_window_y_en)
+				3'b100 :
+					begin
+						w000 <= dy; 
+						w001 <= (4096 - dy);
+					end
+				3'b010 :
+					begin
+						w000 <= dy; 
+						w001 <= (4096 - dy);
+					end
+				3'b001 :
+					begin
+						w000 <= dy; 
+						w001 <= (4096 - dy);
+
+					end				
+			endcase
+
+		else if(x_cnt >= 479/2 + 1440 - 1 )
+			case(inte_window_y_en)
+				3'b100 :
+					begin
+						w000 <= dy; 
+						w001 <= (4096 - dy);
+					
+					end
+				3'b010 :
+					begin
+						w000 <= dy; 
+						w001 <= (4096 - dy);
+				
+					end
+				3'b001 :
+					begin
+						w000 <= dy; 
+						w001 <= (4096 - dy);
+						
+					end		
+			endcase
+		else if(y_cnt <= 269/2 + 1)
+			case(inte_window_x_en)
+				3'b100 :
+					begin
+						w000 <= dx; 
+						w001 <= (4096 - dx);
+						
+					end
+				3'b010 :
+					begin
+						w000 <= dx; 
+						w001 <= (4096 - dx);
+					
+					end
+				3'b001 :
+					begin
+						w000 <= dx; 
+						w001 <= (4096 - dx);
+					
+					end		
+			endcase
+		
+		else 
+			case(inte_window_x_en)
+				3'b100 :
+					begin
+						w000 <= dx; 
+						w001 <= (4096 - dx);
+					
+					end
+				3'b010 :
+					begin
+						w000 <= dx; 
+						w001 <= (4096 - dx);
+						
+					end
+				3'b001 :
+					begin
+						w000 <= dx; 
+						w001 <= (4096 - dx);
+						
+					end	
+			endcase
+	end 
+end
+
+always @(posedge i_clk) begin 
+	if(img_vs)begin
+		if(x_cnt <= 479/2 + 1)
+			case(inte_window_y_en_2d)
+				3'b100 :
+					begin
+						
+						h01 <= inte0_ram[img_y] * w001 + inte4_ram[img_y] * w000;   
+						v_result0 <= h01;
+						pixel_out2 <= v_result0 >> 12;	
+					end
+				3'b010 :
+					begin
+						
+						h01 <= inte4_ram[img_y] * w001 + inte8_ram[img_y] * w000;   
+						v_result0 <= h01;
+						pixel_out2 <= v_result0 >> 12;	
+					end
+				3'b001 :
+					begin
+						
+						h01 <= inte8_ram[img_y] * w001 + inte12_ram[img_y] * w000;   
+						v_result0 <= h01;
+						pixel_out2 <= v_result0 >> 12;	
+					end			
+			endcase
+
+		else if(x_cnt >= 479/2 + 1440 - 1 )
+			case(inte_window_y_en_2d)
+				3'b100 :
+					begin
+						
+						h01 <= inte3_ram[img_y] * w001 + inte7_ram[img_y] * w000;   
+						v_result0 <= h01;
+						pixel_out2 <= v_result0 >> 12;	
+					end
+				3'b010 :
+					begin
+						
+						h01 <= inte7_ram[img_y] * w001 + inte11_ram[img_y] * w000;   
+						v_result0 <= h01;
+						pixel_out2 <= v_result0 >> 12;	
+					end
+				3'b001 :
+					begin
+						
+						h01 <= inte11_ram[img_y] * w001 + inte15_ram[img_y] * w000;   
+						v_result0 <= h01;
+						pixel_out2 <= v_result0 >> 12;	
+					end
+				
+			endcase
+		else if(y_cnt <= 269/2 + 1)
+			case(inte_window_x_en_2d)
+				3'b100 :
+					begin
+						
+						h01 <= inte0_ram[img_y] * w001 + inte1_ram[img_y] * w000;   
+						v_result0 <= h01;
+						pixel_out2 <= v_result0 >> 12;	
+					end
+				3'b010 :
+					begin
+					
+						h01 <= inte1_ram[img_y] * w001 + inte2_ram[img_y] * w000;   
+						v_result0 <= h01;
+						pixel_out2 <= v_result0 >> 12;	
+					end
+				3'b001 :
+					begin
+						
+						h01 <= inte2_ram[img_y] * w001 + inte3_ram[img_y] * w000;   
+						v_result0 <= h01;
+						pixel_out2 <= v_result0 >> 12;	
+					end
+			
+			endcase
+		else 
+			case(inte_window_x_en_2d)
+				3'b100 :
+					begin
+						
+						h01 <= inte12_ram[img_y] * w001 + inte13_ram[img_y] * w000;   
+						v_result0 <= h01;
+						pixel_out2 <= v_result0 >> 12;	
+					end
+				3'b010 :
+					begin
+						
+						h01 <= inte13_ram[img_y] * w001 + inte14_ram[img_y] * w000;   
+						v_result0 <= h01;
+						pixel_out2 <= v_result0 >> 12;	
+					end
+				3'b001 :
+					begin
+						
+						h01 <= inte14_ram[img_y] * w001 + inte15_ram[img_y] * w000;   
+						v_result0 <= h01;
+						pixel_out2 <= v_result0 >> 12;	
+					end
+			endcase
+	end 
+end
+
+wire pix_out1_val;
+wire pix_out2_val;
+reg [6:0] pix_out1_val_d;
+reg [6:0] pix_out2_val_d;
+assign pix_out1_val = (inte_window0 || inte_window1 || inte_window2 || inte_window3 || inte_window4 || inte_window5 || inte_window6 || inte_window7 || inte_window8) ? 'd1 : 'd0; 
+always @(posedge i_clk) begin
+
+	pix_out1_val_d <= {pix_out1_val_d[5:0],pix_out1_val};
+	pix_out2_val_d <= {pix_out2_val_d[5:0],pix_out2_val};
+end
+	
+			
+assign pix_out2_val = ((x_cnt <= 479/2 + 3)        && (inte_y0 || inte_y1 || inte_y2)) ||
+					  ((x_cnt >= 479/2 + 1440 - 1) && (inte_y0 || inte_y1 || inte_y2)) ||
+					  ((y_cnt <= 269/2 + 1)        && (inte_x0 || inte_x1 || inte_x2)) ||
+				      ((y_cnt >= 269/2 + 810 - 1)  && (inte_x0 || inte_x1 || inte_x2))  ? 'd1 : 'd0;
+wire  [8:0] img_y_r;
+assign o_img_vs  =  img_vs_d[1]; 
+assign o_img_hs  =  img_hs_d[1];
+assign o_img_y   =  o_img_y >= 255 ? 255 : o_img_y[7:0];assign img_y_r =  pix_out2_val_d[1] ? pixel_out2 : pix_out1_val_d[1] ? pixel_out1 : pixel_out0;        
+	 
+endmodule 

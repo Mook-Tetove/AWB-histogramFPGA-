@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2020.2 (64-bit)
+# SW Build 3064766 on Wed Nov 18 09:12:45 MST 2020
+# IP Build 3064653 on Wed Nov 18 14:17:31 MST 2020
+# Start of session at: Mon Mar 17 23:15:58 2025
+# Process ID: 3272
+# Current directory: C:/Users/Administrator/Desktop/le/do_ev/Haze_tb
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent11400 C:\Users\Administrator\Desktop\le\do_ev\Haze_tb\Haze_tb.xpr
+# Log file: C:/Users/Administrator/Desktop/le/do_ev/Haze_tb/vivado.log
+# Journal file: C:/Users/Administrator/Desktop/le/do_ev/Haze_tb\vivado.jou
+#-----------------------------------------------------------
+start_gui

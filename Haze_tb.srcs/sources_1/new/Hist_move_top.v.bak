@@ -1,0 +1,106 @@
+module Hist_move_top(
+	input        i_clk     ,
+	input        i_rst     ,   
+	input [7:0]  img_r     ,  
+    input [7:0]  img_g     ,
+    input [7:0]  img_b     ,
+	input        img_hs    ,
+	input        img_vs    ,
+	output       o_img_hs  ,
+	output       o_img_vs  ,
+	output [7:0] o_img_r   ,
+    output [7:0] o_img_g   ,
+    output [7:0] o_img_b   
+
+);
+
+reg [31:0] r_oa_max_pashe    ;
+reg [31:0] b_oa_max_pashe    ;
+reg [15:0] img_hs_d        ;
+reg [15:0] img_vs_d        ;
+
+always@(posedge i_clk) 
+begin 
+	if(i_rst)begin  
+		img_hs_d    <= 'd0 ;
+        img_vs_d    <= 'd0 ;
+	end else begin
+		img_hs_d    <= { img_hs_d[14:0] , img_hs};
+		img_vs_d    <= { img_vs_d[14:0] , img_vs};
+	end
+end 
+
+wire [31:0] r_img_r_oa_max   ;
+wire [31:0] r_img_r_mv_phase ;
+wire [31:0] r_img_l_oa_max   ;
+wire [31:0] r_img_l_mv_phase ;wire [31:0] b_img_r_oa_max   ;
+wire [31:0] b_img_r_mv_phase ;
+wire [31:0] b_img_l_oa_max   ;
+wire [31:0] b_img_l_mv_phase ;
+
+Hist_move_r Hist_move_r_r(
+	.i_clk     (i_clk),
+	.i_rst     (i_rst),   
+	.img_r     (img_r ),
+    .img_g     (img_g ),
+    .img_b     (img_b ),
+	.img_hs    (img_hs),
+	.img_vs    (img_vs),
+	.img_r_oa_max   (r_img_r_oa_max  ),
+    .img_r_mv_phase (r_img_r_mv_phase)
+
+);Hist_move_r Hist_move_r_b(
+	.i_clk     (i_clk),
+	.i_rst     (i_rst),   
+	.img_r     (img_b ),
+    .img_g     (img_g ),
+    .img_b     (img_r ),
+	.img_hs    (img_hs),
+	.img_vs    (img_vs),
+	.img_r_oa_max   (b_img_r_oa_max  ),
+    .img_r_mv_phase (b_img_r_mv_phase)
+
+);
+
+Hist_move_l Hist_move_l_r(
+	.i_clk     (i_clk),
+	.i_rst     (i_rst),   
+	.img_r     (img_r ),
+    .img_g     (img_g ),
+    .img_b     (img_b ),
+	.img_hs    (img_hs),
+	.img_vs    (img_vs),
+	.img_l_oa_max   (r_img_l_oa_max  ),
+    .img_l_mv_phase (r_img_l_mv_phase)
+
+);Hist_move_l Hist_move_l_b(
+	.i_clk     (i_clk),
+	.i_rst     (i_rst),   
+	.img_r     (img_b ),
+    .img_g     (img_g ),
+    .img_b     (img_r ),
+	.img_hs    (img_hs),
+	.img_vs    (img_vs),
+	.img_l_oa_max   (b_img_l_oa_max  ),
+    .img_l_mv_phase (b_img_l_mv_phase)
+
+);
+always@(posedge i_clk) 
+begin 
+	if(i_rst)
+		r_oa_max_pashe <= 'd0;
+	else if(!img_vs_d[0] && img_vs)
+		r_oa_max_pashe <= r_img_l_oa_max >= r_img_r_oa_max ? r_img_l_mv_phase : r_img_r_mv_phase;
+endalways@(posedge i_clk) 
+begin 
+	if(i_rst)
+		b_oa_max_pashe <= 'd0;
+	else if(!img_vs_d[0] && img_vs)
+		b_oa_max_pashe <= b_img_l_oa_max >= b_img_r_oa_max ? b_img_l_mv_phase : b_img_r_mv_phase;
+end
+assign o_img_hs = img_hs;
+assign o_img_vs = img_vs;
+assign o_img_r  = img_r + r_oa_max_pashe >= 255 ? 255 : img_r + r_oa_max_pashe;
+assign o_img_g  = img_g;
+assign o_img_b  = img_b + b_oa_max_pashe >= 255 ? 255 : img_b + b_oa_max_pashe;
+endmodule
